@@ -1,14 +1,15 @@
 Changelog
 =========
 
-0.8.0
+1.0.0
 ------------------
-* General improvements to PyPI setup.py, including long description
+* **Dropped support to Python 2**
 * Added CHANGELOG
-* Removed reprecated testing functions
+* Removed deprecated testing functions
 * Rearranged files to a better packaging organization
 * Fixed setup.py requirements parsing
 * Added GitHub Actions CI
+* General improvements to PyPI setup.py, including long description
 
 
 0.7.8

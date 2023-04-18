@@ -1,4 +1,4 @@
-__version__ = u'0.7.8'
+__version__ = '1.0.0'
 
 from .mox import (
     And,
