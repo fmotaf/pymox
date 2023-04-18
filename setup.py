@@ -15,18 +15,10 @@
 
 import io
 import re
-from glob import glob
 from os.path import dirname
 from os.path import join
-from os.path import basename
-from os.path import splitext
 
 from setuptools import find_packages
-
-try:
-    from pip._internal.req import parse_requirements
-except ImportError:
-    from pip.req import parse_requirements
 
 try:
     from setuptools import setup
@@ -49,12 +41,11 @@ Intended Audience :: Developers
 License :: OSI Approved :: Apache Software License
 Operating System :: OS Independent
 Programming Language :: Python
-Programming Language :: Python :: 2
-Programming Language :: Python :: 2.7
-Programming Language :: Python :: 3
-Programming Language :: Python :: 3.3
-Programming Language :: Python :: 3.4
-Programming Language :: Python :: 3.5
+Programming Language :: Python :: 3.7
+Programming Language :: Python :: 3.8
+Programming Language :: Python :: 3.9
+Programming Language :: Python :: 3.10
+Programming Language :: Python :: 3.11
 Topic :: Software Development :: Quality Assurance
 Topic :: Software Development :: Testing
 Programming Language :: Python :: Implementation :: CPython
@@ -63,8 +54,9 @@ Topic :: Utilities
 """
 
 classifier_list = [c for c in classifiers.split("\n") if c]
-install_reqs = [str(p.req) for p in parse_requirements(
-    join(dirname(__file__), 'requirements.txt'), session='req')]
+requirements_path = join(dirname(__file__), 'requirements.txt')
+with open(requirements_path, "r") as f:
+    install_reqs = f.readlines()
 
 setup(
     name='pymox',
@@ -75,7 +67,7 @@ setup(
     use_scm_version=True,
     setup_requires=['pytest-runner', 'setuptools_scm'],
     install_requires=install_reqs,
-    tests_require=['tox', 'pytest', 'pytest-cov', 'coverage', 'codecov'],
+    tests_require=['tox', 'pytest', 'pytest-cov', 'coverage'],
     long_description=('%s\n%s' % (
         read('README.rst'),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst')))
@@ -90,6 +82,5 @@ setup(
         'mox', 'mock', 'test', 'mocking', 'unittest', 'pymox',
     ],
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*',
-    extras_require={
-    },
+    extras_require={},
 )

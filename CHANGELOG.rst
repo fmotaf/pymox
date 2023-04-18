@@ -3,11 +3,13 @@ Changelog
 
 0.8.0
 ------------------
-
 * General improvements to PyPI setup.py, including long description
 * Added CHANGELOG
 * Removed reprecated testing functions
 * Rearranged files to a better packaging organization
+* Fixed setup.py requirements parsing
+* Added GitHub Actions CI
+
 
 0.7.8
 ------------------
