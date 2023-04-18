@@ -54,3 +54,6 @@ docs/_build/
 # Custom
 .DS_Store
 staticfiles/
+
+# Pycharm
+.idea/
