@@ -1,9 +1,20 @@
 Changelog
 =========
 
+1.0.1
+------------------
+* Fixed changelog
+* Replaced setup.py with pyproject.toml
+* Removed six dependency
+* Formatted the code with black
+* Replaced master branch with main
+* Fixed support to Python 3.3 to 3.5 in dev environment
+* Set up pyproject.toml with Poetry instead of the old setup.py
+
 1.0.0
 ------------------
-* **Dropped support to Python 2**
+* **Dropped Python 2 support**
+* Added support to Python 3.3 through 3.11
 * Added CHANGELOG
 * Removed deprecated testing functions
 * Rearranged files to a better packaging organization
