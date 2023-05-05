@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=58.2.0", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymox"
+dynamic = ["version"]
+
+[tool.poetry]
+name = "pymox"
+description = "Mock object framework"
+# packages = [{include = "mox", from = "src"}]
+packages = [{include = "mox"}]
+version = "0.0.0"  # DO NOT CHANGE VERSION HERE
+authors = ["Ivan Neto <ivan.cr.neto@gmail.com>"]
+license = "Apache License, Version 2.0"
+homepage = "http://pymox.rtfd.io"
+repository = "https://github.com/ivancrneto/pymox"
+classifiers = [
+    "Environment :: Console",
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.3",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Utilities"
+]
+keywords = [
+    "mox", "mock", "test", "mocking", "unittest", "pymox",
+]
+readme = "README.rst"
+
+[tool.poetry.dependencies]
+python = ">=3.3, <4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.2"
+pytest-cov = "^2.5"
+tox = "^2.0"
+coverage = "^4.5"
+
+[tool.scmver]
+enable = true
+write_to = "mox/__version__.py"
+
+[tool.pytest]
+addopts = [
+    "-v",
+    "--cov-config",
+    ".coveragerc",
+    "--cov=mox",
+    "--cov-branch",
+    "--cov-report",
+    "term-missing",
+    "test/mox_test.py"
+]
