@@ -9,7 +9,6 @@ dynamic = ["version"]
 [tool.poetry]
 name = "pymox"
 description = "Mock object framework"
-# packages = [{include = "mox", from = "src"}]
 packages = [{include = "mox"}]
 version = "0.0.0"  # DO NOT CHANGE VERSION HERE
 authors = ["Ivan Neto <ivan.cr.neto@gmail.com>"]
@@ -53,8 +52,7 @@ pytest-cov = "^2.5"
 tox = "^2.0"
 coverage = "^4.5"
 
-[tool.scmver]
-enable = true
+[tool.setuptools_scm]
 write_to = "mox/__version__.py"
 
 [tool.pytest]
