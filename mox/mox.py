@@ -108,8 +108,9 @@ class ExpectedMethodCallsError(Error):
         self._expected_methods = expected_methods
 
     def __str__(self):
-        calls = "\n".join(["%3d.  %s" % (i, m)
-                           for i, m in enumerate(self._expected_methods)])
+        calls = "\n".join(
+            ["%3d.  %s" % (i, m) for i, m in enumerate(self._expected_methods)]
+        )
         return "Verify: Expected methods never called:\n%s" % (calls,)
 
 
@@ -137,11 +138,11 @@ class UnexpectedMethodCallError(Error):
             self._str = "Unexpected method call %s" % (unexpected_method,)
         else:
             differ = difflib.Differ()
-            diff = differ.compare(str(unexpected_method).splitlines(True),
-                                  str(expected).splitlines(True))
-            self._str = (
-                "Unexpected method call.  unexpected:-  expected:+\n%s"
-                % ("\n".join(line.rstrip() for line in diff),)
+            diff = differ.compare(
+                str(unexpected_method).splitlines(True), str(expected).splitlines(True)
+            )
+            self._str = "Unexpected method call.  unexpected:-  expected:+\n%s" % (
+                "\n".join(line.rstrip() for line in diff),
             )
 
     def __str__(self):
@@ -164,8 +165,10 @@ class UnknownMethodCallError(Error):
         self._unknown_method_name = unknown_method_name
 
     def __str__(self):
-        return "Method called is not a member of the object: %s" % \
-               self._unknown_method_name
+        return (
+            "Method called is not a member of the object: %s"
+            % self._unknown_method_name
+        )
 
 
 class PrivateAttributeError(Error):
@@ -178,8 +181,10 @@ class PrivateAttributeError(Error):
         self._attr = attr
 
     def __str__(self):
-        return ("Attribute '%s' is private and should not be available in a "
-                " mock object." % self._attr)
+        return (
+            "Attribute '%s' is private and should not be available in a "
+            " mock object." % self._attr
+        )
 
 
 class ExpectedMockCreationError(Error):
@@ -202,8 +207,9 @@ class ExpectedMockCreationError(Error):
         self._expected_mocks = expected_mocks
 
     def __str__(self):
-        mocks = "\n".join(["%3d.  %s" % (i, m)
-                           for i, m in enumerate(self._expected_mocks)])
+        mocks = "\n".join(
+            ["%3d.  %s" % (i, m) for i, m in enumerate(self._expected_mocks)]
+        )
         return "Verify: Expected mocks never created:\n%s" % (mocks,)
 
 
@@ -229,8 +235,9 @@ class UnexpectedMockCreationError(Error):
         error = "Unexpected mock creation: %s(%s" % (self._instance, args)
 
         if self._named_params:
-            error += ", " + ", ".join(["%s=%s" % (k, v) for k, v in
-                                       six.iteritems(self._named_params)])
+            error += ", " + ", ".join(
+                ["%s=%s" % (k, v) for k, v in six.iteritems(self._named_params)]
+            )
 
         error += ")"
         return error
@@ -256,10 +263,12 @@ class SwallowedExceptionError(Error):
         self._previous_exceptions = previous_exceptions
 
     def __str__(self):
-        exceptions = "\n".join([
-            "%3d.  %s: %s" % (i, e.__class__.__name__, e)
-            for i, e in enumerate(self._previous_exceptions)
-        ])
+        exceptions = "\n".join(
+            [
+                "%3d.  %s: %s" % (i, e.__class__.__name__, e)
+                for i, e in enumerate(self._previous_exceptions)
+            ]
+        )
         return "Previous exceptions thrown:\n%s" % (exceptions,)
 
 
@@ -269,21 +278,21 @@ class Mox(object):
     # A list of types that should be stubbed out with MockObjects (as
     # opposed to MockAnythings).
     _USE_MOCK_OBJECT = [
-        getattr(types, 'ClassType', type),
+        getattr(types, "ClassType", type),
         types.FunctionType,
-        getattr(types, 'InstanceType', object),
+        getattr(types, "InstanceType", object),
         types.ModuleType,
-        getattr(types, 'ObjectType', object),
-        getattr(types, 'TypeType', type),
+        getattr(types, "ObjectType", object),
+        getattr(types, "TypeType", type),
         types.MethodType,
-        getattr(types, 'UnboundMethodType', types.FunctionType),
+        getattr(types, "UnboundMethodType", types.FunctionType),
     ]
 
     # A list of types that may be stubbed out with a MockObjectFactory.
     _USE_MOCK_FACTORY = [
-        getattr(types, 'ClassType', type),
-        getattr(types, 'ObjectType', object),
-        getattr(types, 'TypeType', type),
+        getattr(types, "ClassType", type),
+        getattr(types, "ObjectType", object),
+        getattr(types, "TypeType", type),
     ]
     if abc:
         _USE_MOCK_FACTORY.append(abc.ABCMeta)
@@ -362,18 +371,21 @@ class Mox(object):
         attr_type = type(attr_to_replace)
 
         if attr_type == MockAnything or attr_type == MockObject:
-            raise TypeError('Cannot mock a MockAnything! Did you remember to '
-                            'call UnsetStubs in your previous test?')
+            raise TypeError(
+                "Cannot mock a MockAnything! Did you remember to "
+                "call UnsetStubs in your previous test?"
+            )
 
-        if (attr_type in self._USE_MOCK_OBJECT or
-                # isinstance(attr_type, tuple(self._USE_MOCK_OBJECT)) or
-                isinstance(attr_to_replace, object) or
-                inspect.isclass(attr_to_replace)) and not use_mock_anything:
+        if (
+            attr_type in self._USE_MOCK_OBJECT
+            or
+            # isinstance(attr_type, tuple(self._USE_MOCK_OBJECT)) or
+            isinstance(attr_to_replace, object)
+            or inspect.isclass(attr_to_replace)
+        ) and not use_mock_anything:
             stub = self.CreateMock(attr_to_replace)
         else:
-            stub = self.CreateMockAnything(
-                description='Stub for %s' % attr_to_replace
-            )
+            stub = self.CreateMockAnything(description="Stub for %s" % attr_to_replace)
             stub.__name__ = attr_name
 
         self.stubs.Set(obj, attr_name, stub)
@@ -420,11 +432,13 @@ class Mox(object):
         attr_type = type(attr_to_replace)
 
         if attr_type == MockAnything or attr_type == MockObject:
-            raise TypeError('Cannot mock a MockAnything! Did you remember to '
-                            'call UnsetStubs in your previous test?')
+            raise TypeError(
+                "Cannot mock a MockAnything! Did you remember to "
+                "call UnsetStubs in your previous test?"
+            )
 
         if not inspect.isclass(attr_to_replace):
-            raise TypeError('Given attr is not a Class.  Use StubOutWithMock.')
+            raise TypeError("Given attr is not a Class.  Use StubOutWithMock.")
 
         factory = _MockObjectFactory(attr_to_replace, self)
         self._mock_objects.append(factory)
@@ -497,18 +511,18 @@ class MockAnything:
 
     def __repr__(self):
         if self._description:
-            return '<MockAnything instance of %s>' % self._description
+            return "<MockAnything instance of %s>" % self._description
         else:
-            return '<MockAnything instance>'
+            return "<MockAnything instance>"
 
     def __str__(self):
-        return self._CreateMockMethod('__str__')()
+        return self._CreateMockMethod("__str__")()
 
     def __call__(self, *args, **kwargs):
-        return self._CreateMockMethod('__call__')(*args, **kwargs)
+        return self._CreateMockMethod("__call__")(*args, **kwargs)
 
     def __getitem__(self, i):
-        return self._CreateMockMethod('__getitem__')(i)
+        return self._CreateMockMethod("__getitem__")(i)
 
     def __getattr__(self, method_name):
         """Intercept method calls on this object.
@@ -524,7 +538,7 @@ class MockAnything:
         Returns:
           A new MockMethod aware of MockAnything's state (record or replay).
         """
-        if method_name == '__dir__':
+        if method_name == "__dir__":
             return self.__class__.__dir__.__get__(self, self.__class__)
 
         return self._CreateMockMethod(method_name)
@@ -543,10 +557,14 @@ class MockAnything:
           A new MockMethod aware of MockAnything's state (record or replay).
         """
 
-        return MockMethod(method_name, self._expected_calls_queue,
-                          self._exceptions_thrown, self._replay_mode,
-                          method_to_mock=method_to_mock,
-                          description=self._description)
+        return MockMethod(
+            method_name,
+            self._expected_calls_queue,
+            self._exceptions_thrown,
+            self._replay_mode,
+            method_to_mock=method_to_mock,
+            description=self._description,
+        )
 
     def __nonzero__(self):
         """Return 1 for nonzero so the mock can be used as a conditional."""
@@ -556,9 +574,11 @@ class MockAnything:
     def __eq__(self, rhs):
         """Provide custom logic to compare objects."""
 
-        return (isinstance(rhs, MockAnything) and
-                self._replay_mode == rhs._replay_mode and
-                self._expected_calls_queue == rhs._expected_calls_queue)
+        return (
+            isinstance(rhs, MockAnything)
+            and self._replay_mode == rhs._replay_mode
+            and self._expected_calls_queue == rhs._expected_calls_queue
+        )
 
     def __ne__(self, rhs):
         """Provide custom logic to compare objects."""
@@ -589,13 +609,14 @@ class MockAnything:
         if self._expected_calls_queue:
             # The last MultipleTimesGroup is not popped from the queue.
             is_multiple_times_group = isinstance(
-                self._expected_calls_queue[0],
-                MultipleTimesGroup
+                self._expected_calls_queue[0], MultipleTimesGroup
             )
 
-            if (len(self._expected_calls_queue) == 1 and
-                    is_multiple_times_group and
-                    self._expected_calls_queue[0].IsSatisfied()):
+            if (
+                len(self._expected_calls_queue) == 1
+                and is_multiple_times_group
+                and self._expected_calls_queue[0].IsSatisfied()
+            ):
                 pass
             else:
                 raise ExpectedMethodCallsError(self._expected_calls_queue)
@@ -611,8 +632,7 @@ class MockAnything:
 
 
 class MockObject(MockAnything, object):
-    """A mock object that simulates the public/protected interface of a class.
-    """
+    """A mock object that simulates the public/protected interface of a class."""
 
     def __init__(self, class_to_mock, attrs=None):
         """Initialize a mock object.
@@ -635,7 +655,7 @@ class MockObject(MockAnything, object):
 
         # This is used to hack around the mixin/inheritance of MockAnything,
         # which is not a proper object (it can be anything. :-)
-        MockAnything.__dict__['__init__'](self)
+        MockAnything.__dict__["__init__"](self)
 
         # Get a list of all the public and special methods we should mock.
         self._known_methods = set()
@@ -651,25 +671,30 @@ class MockObject(MockAnything, object):
                 else:
                     method_name = class_to_mock.__func__.__name__
                     class_name = class_to_mock.__self__.__class__.__name__
-                if class_name == 'type':
+                if class_name == "type":
                     class_name = class_to_mock.__self__.__name__
-                self._description = '{}.{}'.format(
-                    class_name, method_name)
+                self._description = "{}.{}".format(class_name, method_name)
             else:
                 search_string = (
-                    '<(?P<extra>function|((un)?bound )?method) (?P<class>\w*)'
-                    '(\.(?P<method>\w*))?( at \w+)?>')
+                    "<(?P<extra>function|((un)?bound )?method) (?P<class>\w*)"
+                    "(\.(?P<method>\w*))?( at \w+)?>"
+                )
                 search = re_search(search_string, str(repr(class_to_mock)))
 
-                self._description = '{}.{}'.format(
-                    search.group('class'), search.group('method'))
+                self._description = "{}.{}".format(
+                    search.group("class"), search.group("method")
+                )
 
-                if (search.group('extra') == 'function' and not
-                        search.group('class') or not search.group('method')):
-                    to_use = search.group('class') or search.group('method')
+                if (
+                    search.group("extra") == "function"
+                    and not search.group("class")
+                    or not search.group("method")
+                ):
+                    to_use = search.group("class") or search.group("method")
                     if inspect.isfunction(self._class_to_mock):
-                        self._description = 'function {}.{}'.format(
-                            self._class_to_mock.__module__, to_use)
+                        self._description = "function {}.{}".format(
+                            self._class_to_mock.__module__, to_use
+                        )
         except Exception:
             try:
                 self._description = type(class_to_mock).__name__
@@ -695,8 +720,8 @@ class MockObject(MockAnything, object):
                 raise PrivateAttributeError(attr)
             elif attr in self._known_methods:
                 raise ValueError(
-                    "'%s' is a method of '%s' objects." %
-                    (attr, class_to_mock))
+                    "'%s' is a method of '%s' objects." % (attr, class_to_mock)
+                )
             else:
                 setattr(self, attr, value)
 
@@ -730,8 +755,8 @@ class MockObject(MockAnything, object):
 
         if name in self._known_methods:
             return self._CreateMockMethod(
-                name,
-                method_to_mock=getattr(self._class_to_mock, name))
+                name, method_to_mock=getattr(self._class_to_mock, name)
+            )
 
         exception = UnknownMethodCallError(name)
         self._exceptions_thrown.append(exception)
@@ -740,10 +765,12 @@ class MockObject(MockAnything, object):
     def __eq__(self, rhs):
         """Provide custom logic to compare objects."""
 
-        return (isinstance(rhs, MockObject) and
-                self._class_to_mock == rhs._class_to_mock and
-                self._replay_mode == rhs._replay_mode and
-                self._expected_calls_queue == rhs._expected_calls_queue)
+        return (
+            isinstance(rhs, MockObject)
+            and self._class_to_mock == rhs._class_to_mock
+            and self._replay_mode == rhs._replay_mode
+            and self._expected_calls_queue == rhs._expected_calls_queue
+        )
 
     def __setitem__(self, key, value):
         """Provide custom logic for mocking classes that support item
@@ -765,22 +792,21 @@ class MockObject(MockAnything, object):
 
         """
         # Verify the class supports item assignment.
-        if '__setitem__' not in dir(self._class_to_mock):
-            raise TypeError('object does not support item assignment')
+        if "__setitem__" not in dir(self._class_to_mock):
+            raise TypeError("object does not support item assignment")
 
         # If we are in replay mode then simply call the mock __setitem__
         # method.
         if self._replay_mode:
             return MockMethod(
-                '__setitem__',
+                "__setitem__",
                 self._expected_calls_queue,
                 self._exceptions_thrown,
-                self._replay_mode)(
-                key,
-                value)
+                self._replay_mode,
+            )(key, value)
 
         # Otherwise, create a mock method __setitem__.
-        return self._CreateMockMethod('__setitem__')(key, value)
+        return self._CreateMockMethod("__setitem__")(key, value)
 
     def __getitem__(self, key):
         """Provide custom logic for mocking classes that are subscriptable.
@@ -800,17 +826,21 @@ class MockObject(MockAnything, object):
 
         """
         # Verify the class supports item assignment.
-        if '__getitem__' not in dir(self._class_to_mock):
-            raise TypeError('unsubscriptable object')
+        if "__getitem__" not in dir(self._class_to_mock):
+            raise TypeError("unsubscriptable object")
 
         # If we are in replay mode then simply call the mock __getitem__
         # method.
         if self._replay_mode:
-            return MockMethod('__getitem__', self._expected_calls_queue,
-                              self._exceptions_thrown, self._replay_mode)(key)
+            return MockMethod(
+                "__getitem__",
+                self._expected_calls_queue,
+                self._exceptions_thrown,
+                self._replay_mode,
+            )(key)
 
         # Otherwise, create a mock method __getitem__.
-        return self._CreateMockMethod('__getitem__')(key)
+        return self._CreateMockMethod("__getitem__")(key)
 
     def __iter__(self):
         """Provide custom logic for mocking classes that are iterable.
@@ -828,11 +858,11 @@ class MockObject(MockAnything, object):
         methods = dir(self._class_to_mock)
 
         # Verify the class supports iteration.
-        if '__iter__' not in methods:
+        if "__iter__" not in methods:
             # If it doesn't have iter method and we are in replay method, then
             # try to iterate using subscripts.
-            if '__getitem__' not in methods or not self._replay_mode:
-                raise TypeError('not iterable object')
+            if "__getitem__" not in methods or not self._replay_mode:
+                raise TypeError("not iterable object")
             else:
                 results = []
                 index = 0
@@ -845,11 +875,15 @@ class MockObject(MockAnything, object):
 
         # If we are in replay mode then simply call the mock __iter__ method.
         if self._replay_mode:
-            return MockMethod('__iter__', self._expected_calls_queue,
-                              self._exceptions_thrown, self._replay_mode)()
+            return MockMethod(
+                "__iter__",
+                self._expected_calls_queue,
+                self._exceptions_thrown,
+                self._replay_mode,
+            )()
 
         # Otherwise, create a mock method __iter__.
-        return self._CreateMockMethod('__iter__')()
+        return self._CreateMockMethod("__iter__")()
 
     def __contains__(self, key):
         """Provide custom logic for mocking classes that contain items.
@@ -868,29 +902,33 @@ class MockObject(MockAnything, object):
           __contains__.
 
         """
-        contains = getattr(self._class_to_mock, '__contains__', None)
+        contains = getattr(self._class_to_mock, "__contains__", None)
 
         if contains is None:
-            raise TypeError('unsubscriptable object')
+            raise TypeError("unsubscriptable object")
 
         if self._replay_mode:
-            return MockMethod('__contains__', self._expected_calls_queue,
-                              self._exceptions_thrown, self._replay_mode)(key)
+            return MockMethod(
+                "__contains__",
+                self._expected_calls_queue,
+                self._exceptions_thrown,
+                self._replay_mode,
+            )(key)
 
-        return self._CreateMockMethod('__contains__')(key)
+        return self._CreateMockMethod("__contains__")(key)
 
     def __call__(self, *params, **named_params):
         """Provide custom logic for mocking classes that are callable."""
 
         # Verify the class we are mocking is callable.
-        callable = hasattr(self._class_to_mock, '__call__')
+        callable = hasattr(self._class_to_mock, "__call__")
         # callable = callable and str(
         #     type(self._class_to_mock.__call__)) not in [
         #         "<class 'method-wrapper'>",  # python 3
         #         "<type 'method-wrapper'>"  # python 2
         #     ]
         if not callable:
-            raise TypeError('Not callable')
+            raise TypeError("Not callable")
 
         # Because the call is happening directly on this object instead of a
         # method, the call on the mock method is made right here
@@ -901,8 +939,8 @@ class MockObject(MockAnything, object):
         if type(self._class_to_mock) in (types.FunctionType, types.MethodType):
             method = self._class_to_mock
         else:
-            method = getattr(self._class_to_mock, '__call__')
-        mock_method = self._CreateMockMethod('__call__', method_to_mock=method)
+            method = getattr(self._class_to_mock, "__call__")
+        mock_method = self._CreateMockMethod("__call__", method_to_mock=method)
 
         return mock_method(*params, **named_params)
 
@@ -939,15 +977,16 @@ class _MockObjectFactory(MockObject):
     def __call__(self, *params, **named_params):
         """Instantiate and record that a new mock has been created."""
 
-        method = getattr(self._class_to_mock, '__init__')
-        mock_method = self._CreateMockMethod('__init__', method_to_mock=method)
+        method = getattr(self._class_to_mock, "__init__")
+        mock_method = self._CreateMockMethod("__init__", method_to_mock=method)
         # Note: calling mock_method() is deferred in order to catch the
         # empty instance_queue first.
 
         if self._replay_mode:
             if not self._instance_queue:
                 exception = UnexpectedMockCreationError(
-                    self._class_to_mock, *params, **named_params)
+                    self._class_to_mock, *params, **named_params
+                )
                 self._exceptions_thrown.append(exception)
                 raise exception
 
@@ -985,18 +1024,18 @@ class MethodSignatureChecker(object):
             Some methods and functions like built-ins can't be inspected.
         """
         try:
-            signature_fn = 'getargspec' if six.PY2 else 'getfullargspec'
-            self._args, varargs, varkw, defaults = getattr(
-                inspect, signature_fn)(method)[:4]
+            signature_fn = "getargspec" if six.PY2 else "getfullargspec"
+            self._args, varargs, varkw, defaults = getattr(inspect, signature_fn)(
+                method
+            )[:4]
         except TypeError:
-            raise ValueError('Could not get argument specification for %r'
-                             % (method,))
+            raise ValueError("Could not get argument specification for %r" % (method,))
         self._method = method
-        if inspect.ismethod(
-            self._method) or (
-            '.' in repr(
-                self._method)) or (
-                self._args and self._args[0] == 'self'):
+        if (
+            inspect.ismethod(self._method)
+            or ("." in repr(self._method))
+            or (self._args and self._args[0] == "self")
+        ):
             self._args = self._args[1:]  # Skip 'self'.
         self._instance = None  # May contain the instance this is bound to.
 
@@ -1006,8 +1045,8 @@ class MethodSignatureChecker(object):
             self._required_args = self._args
             self._default_args = []
         else:
-            self._required_args = self._args[:-len(defaults)]
-            self._default_args = self._args[-len(defaults):]
+            self._required_args = self._args[: -len(defaults)]
+            self._default_args = self._args[-len(defaults) :]
 
     def _RecordArgumentGiven(self, arg_name, arg_status):
         """Mark an argument as being given.
@@ -1023,7 +1062,7 @@ class MethodSignatureChecker(object):
           AttributeError: arg_name is already marked as _GIVEN.
         """
         if arg_status.get(arg_name, None) == MethodSignatureChecker._GIVEN:
-            raise AttributeError('%s provided more than once' % (arg_name,))
+            raise AttributeError("%s provided more than once" % (arg_name,))
         arg_status[arg_name] = MethodSignatureChecker._GIVEN
 
     def Check(self, params, named_params):
@@ -1039,8 +1078,9 @@ class MethodSignatureChecker(object):
           AttributeError: the given parameters don't work with the given
           method.
         """
-        arg_status = dict((a, MethodSignatureChecker._NEEDED)
-                          for a in self._required_args)
+        arg_status = dict(
+            (a, MethodSignatureChecker._NEEDED) for a in self._required_args
+        )
         for arg in self._default_args:
             arg_status[arg] = MethodSignatureChecker._DEFAULT
 
@@ -1055,39 +1095,41 @@ class MethodSignatureChecker(object):
         # correct, this will cause extra executions of the function.
         # NOTE: '.' in repr(self._method) is very bad way to check if it's a
         # bound method. Improve it as soon as possible.
-        if inspect.ismethod(self._method) or '.' in repr(self._method):
+        if inspect.ismethod(self._method) or "." in repr(self._method):
             # The extra param accounts for the bound instance.
             if len(params) > len(self._required_args):
-                expected = getattr(self._method, 'im_class', None)
+                expected = getattr(self._method, "im_class", None)
                 if not expected:
                     search = re_search(
-                        '<(function|method) (?P<class>\w+)\.\w+ at \w+>',
-                        str(repr(self._method)))
+                        "<(function|method) (?P<class>\w+)\.\w+ at \w+>",
+                        str(repr(self._method)),
+                    )
                     if search:
-                        class_ = search.group('class')
+                        class_ = search.group("class")
                         members = dict(inspect.getmembers(self._method))
                         expected = members.get(
-                            class_, members.get('__globals__', {})
+                            class_, members.get("__globals__", {})
                         ).get(class_, None)
                 if not expected:
                     search = re_search(
-                        '<(?P<method>((un)?bound method ))(?P<class>\w+)'
-                        '\.\w+ of <?(?P<module>\w+\.)(?P<class2>\w+) object '
-                        'at [A-Za-z0-9]+>?>',
-                        str(repr(self._method))
+                        "<(?P<method>((un)?bound method ))(?P<class>\w+)"
+                        "\.\w+ of <?(?P<module>\w+\.)(?P<class2>\w+) object "
+                        "at [A-Za-z0-9]+>?>",
+                        str(repr(self._method)),
                     )
 
                     if search:
                         for _, class_ in search.groupdict().items():
                             members = dict(inspect.getmembers(self._method))
                             expected = members.get(
-                                class_, members.get('__globals__', {})
+                                class_, members.get("__globals__", {})
                             ).get(class_, None)
                             if expected:
                                 break
                 if not expected and six.PY3:
-                    expected = dict(
-                        inspect.getmembers(self._method))['__self__'].__class__
+                    expected = dict(inspect.getmembers(self._method))[
+                        "__self__"
+                    ].__class__
 
                 # Check if the param is an instance of the expected class,
                 # or check equality (useful for checking Comparators).
@@ -1096,7 +1138,7 @@ class MethodSignatureChecker(object):
                 # parameter can be a Comparator, and the comparison may raise
                 # an exception during this comparison, which is OK.
                 try:
-                    param_equality = (params[0] == expected)
+                    param_equality = params[0] == expected
                 except BaseException:
                     param_equality = False
 
@@ -1106,8 +1148,7 @@ class MethodSignatureChecker(object):
                 # inverse of the usual case - that the given instance is a
                 # subclass of the expected class.  For example, the code under
                 # test does late binding to a subclass.
-                elif (isinstance(params[0], IsA) and
-                        params[0]._IsSubClass(expected)):
+                elif isinstance(params[0], IsA) and params[0]._IsSubClass(expected):
                     params = params[1:]
 
         # Check that each positional param is valid.
@@ -1117,25 +1158,31 @@ class MethodSignatureChecker(object):
             except IndexError:
                 if not self._has_varargs:
                     raise AttributeError(
-                        '%s does not take %d or more positional '
-                        'arguments' %
-                        (self._method.__name__, i))
+                        "%s does not take %d or more positional "
+                        "arguments" % (self._method.__name__, i)
+                    )
             else:
                 self._RecordArgumentGiven(arg_name, arg_status)
 
         # Check each keyword argument.
         for arg_name in named_params:
             if arg_name not in arg_status and not self._has_varkw:
-                raise AttributeError('%s is not expecting keyword argument %s'
-                                     % (self._method.__name__, arg_name))
+                raise AttributeError(
+                    "%s is not expecting keyword argument %s"
+                    % (self._method.__name__, arg_name)
+                )
             self._RecordArgumentGiven(arg_name, arg_status)
 
         # Ensure all the required arguments have been given.
-        still_needed = [k for k, v in six.iteritems(arg_status)
-                        if v == MethodSignatureChecker._NEEDED]
+        still_needed = [
+            k
+            for k, v in six.iteritems(arg_status)
+            if v == MethodSignatureChecker._NEEDED
+        ]
         if still_needed:
-            raise AttributeError('No values given for arguments: %s'
-                                 % (' '.join(sorted(still_needed))))
+            raise AttributeError(
+                "No values given for arguments: %s" % (" ".join(sorted(still_needed)))
+            )
 
 
 class MockMethod(object):
@@ -1147,8 +1194,15 @@ class MockMethod(object):
     method (name and signature) matches the expected method.
     """
 
-    def __init__(self, method_name, call_queue, exception_list, replay_mode,
-                 method_to_mock=None, description=None):
+    def __init__(
+        self,
+        method_name,
+        call_queue,
+        exception_list,
+        replay_mode,
+        method_to_mock=None,
+        description=None,
+    ):
         """Construct a new mock method.
 
         Args:
@@ -1231,18 +1285,22 @@ class MockMethod(object):
 
         raise AttributeError(
             'MockMethod has no attribute "%s". '
-            'Did you remember to put your mocks in replay mode?' %
-            name)
+            "Did you remember to put your mocks in replay mode?" % name
+        )
 
     def __iter__(self):
         """Raise a TypeError with a helpful message."""
-        raise TypeError('MockMethod cannot be iterated. '
-                        'Did you remember to put your mocks in replay mode?')
+        raise TypeError(
+            "MockMethod cannot be iterated. "
+            "Did you remember to put your mocks in replay mode?"
+        )
 
     def __next__(self):
         """Raise a TypeError with a helpful message."""
-        raise TypeError('MockMethod cannot be iterated. '
-                        'Did you remember to put your mocks in replay mode?')
+        raise TypeError(
+            "MockMethod cannot be iterated. "
+            "Did you remember to put your mocks in replay mode?"
+        )
 
     next = __next__
 
@@ -1285,9 +1343,10 @@ class MockMethod(object):
         return expected
 
     def __str__(self):
-        params = ', '.join(
-            [repr(p) for p in self._params or []] +
-            ['%s=%r' % x for x in sorted((self._named_params or {}).items())])
+        params = ", ".join(
+            [repr(p) for p in self._params or []]
+            + ["%s=%r" % x for x in sorted((self._named_params or {}).items())]
+        )
         full_desc = "%s(%s) -> %r" % (self._name, params, self._return_value)
         if self._description:
             full_desc = "%s.%s" % (self._description, full_desc)
@@ -1301,10 +1360,12 @@ class MockMethod(object):
           rhs: MockMethod
         """
 
-        return (isinstance(rhs, MockMethod) and
-                self._name == rhs._name and
-                self._params == rhs._params and
-                self._named_params == rhs._named_params)
+        return (
+            isinstance(rhs, MockMethod)
+            and self._name == rhs._name
+            and self._params == rhs._params
+            and self._named_params == rhs._named_params
+        )
 
     def __hash__(self):
         return id(self)
@@ -1534,7 +1595,7 @@ class IsA(Comparator):
             return isinstance(clazz, type(self._class_name))
 
     def __repr__(self):
-        return 'mox.IsA(%s) ' % str(self._class_name)
+        return "mox.IsA(%s) " % str(self._class_name)
 
 
 class IsAlmost(Comparator):
@@ -1612,7 +1673,7 @@ class StrContains(Comparator):
             return False
 
     def __repr__(self):
-        return '<str containing \'%s\'>' % self._search_string
+        return "<str containing '%s'>" % self._search_string
 
 
 class Regex(Comparator):
@@ -1649,10 +1710,10 @@ class Regex(Comparator):
         pattern = self.regex.pattern
         if isinstance(pattern, six.binary_type):
             pattern = pattern.decode()
-        s = '<regular expression \'{}\''.format(pattern)
+        s = "<regular expression '{}'".format(pattern)
         if self.regex.flags:
-            s += ', flags=%d' % self.regex.flags
-        s += '>'
+            s += ", flags=%d" % self.regex.flags
+        s += ">"
         return s
 
 
@@ -1688,7 +1749,7 @@ class In(Comparator):
             return False
 
     def __repr__(self):
-        return '<sequence or map containing \'%s\'>' % str(self._key)
+        return "<sequence or map containing '%s'>" % str(self._key)
 
 
 class Not(Comparator):
@@ -1705,8 +1766,9 @@ class Not(Comparator):
           # predicate: a Comparator instance.
         """
 
-        assert isinstance(predicate, Comparator), ("predicate %r must be a"
-                                                   " Comparator." % predicate)
+        assert isinstance(predicate, Comparator), (
+            "predicate %r must be a" " Comparator." % predicate
+        )
         self._predicate = predicate
 
     def equals(self, rhs):
@@ -1725,7 +1787,7 @@ class Not(Comparator):
             return False
 
     def __repr__(self):
-        return '<not \'%s\'>' % self._predicate
+        return "<not '%s'>" % self._predicate
 
 
 class ContainsKeyValue(Comparator):
@@ -1759,8 +1821,10 @@ class ContainsKeyValue(Comparator):
             return False
 
     def __repr__(self):
-        return '<map containing the entry \'%s: %s\'>' % (str(self._key),
-                                                          str(self._value))
+        return "<map containing the entry '%s: %s'>" % (
+            str(self._key),
+            str(self._value),
+        )
 
 
 class ContainsAttributeValue(Comparator):
@@ -1833,8 +1897,7 @@ class SameElementsAs(Comparator):
             return False
 
         try:
-            expected = dict([(element, None)
-                             for element in self._expected_list])
+            expected = dict([(element, None) for element in self._expected_list])
             actual = dict([(element, None) for element in actual_list])
         except TypeError:
             # Fall back to slower list-compare if any of the objects are
@@ -1852,7 +1915,7 @@ class SameElementsAs(Comparator):
             return set(actual_list) == set(self._expected_list)
 
     def __repr__(self):
-        return '<sequence with same elements as \'%s\'>' % self._expected_list
+        return "<sequence with same elements as '%s'>" % self._expected_list
 
 
 class And(Comparator):
@@ -1886,7 +1949,7 @@ class And(Comparator):
         return True
 
     def __repr__(self):
-        return '<AND %s>' % str(self._comparators)
+        return "<AND %s>" % str(self._comparators)
 
 
 class Or(Comparator):
@@ -1920,7 +1983,7 @@ class Or(Comparator):
         return False
 
     def __repr__(self):
-        return '<OR %s>' % str(self._comparators)
+        return "<OR %s>" % str(self._comparators)
 
 
 class Func(Comparator):
@@ -1990,7 +2053,7 @@ class IgnoreArg(Comparator):
         return True
 
     def __repr__(self):
-        return '<IgnoreArg>'
+        return "<IgnoreArg>"
 
 
 class Value(Comparator):
@@ -2037,8 +2100,7 @@ class Remember(Comparator):
 
     def __init__(self, value_store):
         if not isinstance(value_store, Value):
-            raise TypeError(
-                "value_store is not an instance of the Value class")
+            raise TypeError("value_store is not an instance of the Value class")
         self._value_store = value_store
 
     def equals(self, rhs):
@@ -2096,7 +2158,8 @@ class UnorderedGroup(MethodGroup):
         return '%s "%s" pending calls:\n%s' % (
             self.__class__.__name__,
             self._group_name,
-            "\n".join(str(method) for method in self._methods))
+            "\n".join(str(method) for method in self._methods),
+        )
 
     def AddMethod(self, mock_method):
         """Add a method to this group.
@@ -2212,8 +2275,7 @@ class MultipleTimesGroup(MethodGroup):
             raise exception
 
     def IsSatisfied(self):
-        """Return True if all methods in this group are called at least once.
-        """
+        """Return True if all methods in this group are called at least once."""
         return len(self._methods_left) == 0
 
 
@@ -2244,7 +2306,7 @@ class MoxMetaTestBase(type):
                         continue
 
         for func_name, func in d.items():
-            if func_name.startswith('test') and callable(func):
+            if func_name.startswith("test") and callable(func):
                 setattr(cls, func_name, MoxMetaTestBase.CleanUpTest(cls, func))
 
     @staticmethod
@@ -2262,14 +2324,13 @@ class MoxMetaTestBase(type):
         """
 
         def new_method(self, *args, **kwargs):
-            mox_obj = getattr(self, 'mox', None)
-            stubout_obj = getattr(self, 'stubs', None)
+            mox_obj = getattr(self, "mox", None)
+            stubout_obj = getattr(self, "stubs", None)
             cleanup_mox = False
             cleanup_stubout = False
             if mox_obj and isinstance(mox_obj, Mox):
                 cleanup_mox = True
-            if stubout_obj and isinstance(
-                    stubout_obj, stubout.StubOutForTesting):
+            if stubout_obj and isinstance(stubout_obj, stubout.StubOutForTesting):
                 cleanup_stubout = True
             try:
                 func(self, *args, **kwargs)
@@ -2288,7 +2349,7 @@ class MoxMetaTestBase(type):
         return new_method
 
 
-_MoxTestBase = MoxMetaTestBase('_MoxTestBase', (unittest.TestCase,), {})
+_MoxTestBase = MoxMetaTestBase("_MoxTestBase", (unittest.TestCase,), {})
 
 
 class MoxTestBase(_MoxTestBase):

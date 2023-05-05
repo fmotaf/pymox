@@ -20,16 +20,16 @@ import six
 
 class StubOutForTesting:
     """Sample Usage:
-       You want os.path.exists() to always return true during testing.
+    You want os.path.exists() to always return true during testing.
 
-       stubs = StubOutForTesting()
-       stubs.Set(os.path, 'exists', lambda x: 1)
-         ...
-       stubs.UnsetAll()
+    stubs = StubOutForTesting()
+    stubs.Set(os.path, 'exists', lambda x: 1)
+      ...
+    stubs.UnsetAll()
 
-       The above changes os.path.exists into a lambda that returns 1.  Once
-       the ... part of the code finishes, the UnsetAll() looks up the old value
-       of os.path.exists and restores it.
+    The above changes os.path.exists into a lambda that returns 1.  Once
+    the ... part of the code finishes, the UnsetAll() looks up the old value
+    of os.path.exists and restores it.
 
     """
 
@@ -43,26 +43,27 @@ class StubOutForTesting:
 
     def SmartSet(self, obj, attr_name, new_attr):
         """Replace obj.attr_name with new_attr. This method is smart and works
-           at the module, class, and instance level while preserving proper
-           inheritance. It will not stub out C types however unless that has
-           been explicitly allowed by the type.
+         at the module, class, and instance level while preserving proper
+         inheritance. It will not stub out C types however unless that has
+         been explicitly allowed by the type.
 
-           This method supports the case where attr_name is a staticmethod or a
-           classmethod of obj.
+         This method supports the case where attr_name is a staticmethod or a
+         classmethod of obj.
 
-           Notes:
-          - If obj is an instance, then it is its class that will actually be
-            stubbed. Note that the method Set() does not do that: if obj is
-            an instance, it (and not its class) will be stubbed.
-          - The stubbing is using the builtin getattr and setattr. So, the
-            __get__ and __set__ will be called when stubbing (TODO: A better
-            idea would probably be to manipulate obj.__dict__ instead of
-            getattr() and setattr()).
+         Notes:
+        - If obj is an instance, then it is its class that will actually be
+          stubbed. Note that the method Set() does not do that: if obj is
+          an instance, it (and not its class) will be stubbed.
+        - The stubbing is using the builtin getattr and setattr. So, the
+          __get__ and __set__ will be called when stubbing (TODO: A better
+          idea would probably be to manipulate obj.__dict__ instead of
+          getattr() and setattr()).
 
-           Raises AttributeError if the attribute cannot be found.
+         Raises AttributeError if the attribute cannot be found.
         """
-        if (inspect.ismodule(obj) or
-                (not inspect.isclass(obj) and attr_name in obj.__dict__)):
+        if inspect.ismodule(obj) or (
+            not inspect.isclass(obj) and attr_name in obj.__dict__
+        ):
             orig_obj = obj
             orig_attr = getattr(obj, attr_name)
 
@@ -89,9 +90,7 @@ class StubOutForTesting:
         # Calling getattr() on a staticmethod transforms it to a 'normal'
         # function. We need to ensure that we put it back as a staticmethod.
         old_attribute = obj.__dict__.get(attr_name)
-        if old_attribute is not None and isinstance(
-                old_attribute,
-                staticmethod):
+        if old_attribute is not None and isinstance(old_attribute, staticmethod):
             orig_attr = staticmethod(orig_attr)
 
         self.stubs.append((orig_obj, attr_name, orig_attr))
@@ -147,6 +146,6 @@ class StubOutForTesting:
         # undone)
         self.cache.reverse()
 
-        for (parent, old_child, child_name) in self.cache:
+        for parent, old_child, child_name in self.cache:
             setattr(parent, child_name, old_child)
         self.cache = []
