@@ -17,8 +17,8 @@
 import unittest
 
 import mox
-import stubout
-import stubout_testee
+from mox import stubout
+from . import stubout_testee
 
 
 class StubOutForTestingTest(unittest.TestCase):
