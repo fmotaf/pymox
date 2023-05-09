@@ -43,7 +43,7 @@ jobs:
 #        run: poetry run black . --check
 
       - name: Test with pytest
-        run: poetry run pytest --cov . -n 2
+        run: poetry run pytest
 
   build_older:
     runs-on: ubuntu-latest
@@ -83,4 +83,4 @@ jobs:
 #        run: poetry run black . --check
 
       - name: Test with pytest
-        run: poetry run pytest --cov . -n 2
+        run: poetry run pytest
