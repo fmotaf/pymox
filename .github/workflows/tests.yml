@@ -22,7 +22,7 @@ jobs:
       - name: Install Poetry
         run: python -m pip install poetry
       - name: Cache Poetry virtualenv
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: cache
         with:
          path: ~/.virtualenvs
@@ -59,7 +59,7 @@ jobs:
       - name: Install Poetry
         run: python -m pip install poetry
       - name: Cache Poetry virtualenv
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: cache
         with:
          path: ~/.virtualenvs
