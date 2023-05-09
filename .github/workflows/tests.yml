@@ -39,8 +39,8 @@ jobs:
         run: poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
-#      - name: Code Quality
-#        run: poetry run black . --check
+      - name: Code Quality
+        run: poetry run black . --check
 
       - name: Test with pytest
         run: poetry run pytest
@@ -79,8 +79,8 @@ jobs:
         run: poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
-#      - name: Code Quality
-#        run: poetry run black . --check
+      - name: Code Quality
+        run: poetry run black . --check
 
       - name: Test with pytest
         run: poetry run pytest

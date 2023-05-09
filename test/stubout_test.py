@@ -34,7 +34,7 @@ class StubOutForTestingTest(unittest.TestCase):
         mock_function()
 
         stubber = stubout.StubOutForTesting()
-        stubber.SmartSet(stubout_testee, 'SampleFunction', mock_function)
+        stubber.SmartSet(stubout_testee, "SampleFunction", mock_function)
 
         self.mox.ReplayAll()
 
@@ -43,5 +43,5 @@ class StubOutForTestingTest(unittest.TestCase):
         self.mox.VerifyAll()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
