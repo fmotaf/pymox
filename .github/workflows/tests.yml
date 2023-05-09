@@ -37,6 +37,6 @@ jobs:
           default: "${{ matrix.python-version }}"
           command: pip install -U pip  # upgrade pip after installing python
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: poetry install
       - name: Run tests
-        run: python setup.py test
+        run: poetry run pytest
