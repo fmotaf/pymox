@@ -47,10 +47,21 @@ readme = "README.rst"
 python = ">=3.3, <4"
 
 [tool.poetry.group.dev.dependencies]
-pytest = ">=3.2"
-pytest-cov = ">=2.5"
-tox = ">=2.0"
-coverage = ">=4.5"
+pytest = [
+    {version = "^3.2", python = "<3.6"},
+    {version = "^6.1", python = "==3.6"},
+    {version = "^7.1", python = ">=3.7"}
+]
+pytest-cov = [
+    {version = "^2.5", python = "<3.6"},
+    {version = "^3.0", python = "==3.6"},
+    {version = "^4.0", python = ">=3.7"}
+]
+coverage = [
+    {version = "^4.5", python = "<3.6"},
+    {version = "^6.1", python = "==3.6"},
+    {version = "^7.2", python = ">=3.7"}
+]
 
 [tool.setuptools_scm]
 write_to = "mox/__version__.py"
