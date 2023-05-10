@@ -46,11 +46,11 @@ readme = "README.rst"
 [tool.poetry.dependencies]
 python = ">=3.3, <4"
 
-[tool.poetry.dev-dependencies]
-pytest = "^3.2"
-pytest-cov = "^2.5"
-tox = "^2.0"
-coverage = "^4.5"
+[tool.poetry.group.dev.dependencies]
+pytest = ">=3.2"
+pytest-cov = ">=2.5"
+tox = ">=2.0"
+coverage = ">=4.5"
 
 [tool.setuptools_scm]
 write_to = "mox/__version__.py"
