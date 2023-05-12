@@ -65,17 +65,15 @@ try:
     import abc
 except ImportError:
     abc = None  # Python 2.5 and earlier
-from collections import deque
 import difflib
 import inspect
 import re
-import six
 import types
 import unittest
+from collections import deque
+from re import search as re_search
 
 from . import stubout
-
-from re import search as re_search
 
 
 class Error(AssertionError):
@@ -236,7 +234,7 @@ class UnexpectedMockCreationError(Error):
 
         if self._named_params:
             error += ", " + ", ".join(
-                ["%s=%s" % (k, v) for k, v in six.iteritems(self._named_params)]
+                ["%s=%s" % (k, v) for k, v in self._named_params.items()]
             )
 
         error += ")"
@@ -665,12 +663,8 @@ class MockObject(MockAnything, object):
             if inspect.isclass(self._class_to_mock):
                 self._description = class_to_mock.__name__
             elif inspect.ismethod(self._class_to_mock):
-                if six.PY2:
-                    method_name = class_to_mock.im_func.__name__
-                    class_name = class_to_mock.im_class.__name__
-                else:
-                    method_name = class_to_mock.__func__.__name__
-                    class_name = class_to_mock.__self__.__class__.__name__
+                method_name = class_to_mock.__func__.__name__
+                class_name = class_to_mock.__self__.__class__.__name__
                 if class_name == "type":
                     class_name = class_to_mock.__self__.__name__
                 self._description = "{}.{}".format(class_name, method_name)
@@ -1024,8 +1018,7 @@ class MethodSignatureChecker(object):
             Some methods and functions like built-ins can't be inspected.
         """
         try:
-            signature_fn = "getargspec" if six.PY2 else "getfullargspec"
-            self._args, varargs, varkw, defaults = getattr(inspect, signature_fn)(
+            self._args, varargs, varkw, defaults = getattr(inspect, "getfullargspec")(
                 method
             )[:4]
         except TypeError:
@@ -1126,7 +1119,7 @@ class MethodSignatureChecker(object):
                             ).get(class_, None)
                             if expected:
                                 break
-                if not expected and six.PY3:
+                if not expected:
                     expected = dict(inspect.getmembers(self._method))[
                         "__self__"
                     ].__class__
@@ -1175,9 +1168,7 @@ class MethodSignatureChecker(object):
 
         # Ensure all the required arguments have been given.
         still_needed = [
-            k
-            for k, v in six.iteritems(arg_status)
-            if v == MethodSignatureChecker._NEEDED
+            k for k, v in arg_status.items() if v == MethodSignatureChecker._NEEDED
         ]
         if still_needed:
             raise AttributeError(
@@ -1708,7 +1699,7 @@ class Regex(Comparator):
 
     def __repr__(self):
         pattern = self.regex.pattern
-        if isinstance(pattern, six.binary_type):
+        if isinstance(pattern, bytes):
             pattern = pattern.decode()
         s = "<regular expression '{}'".format(pattern)
         if self.regex.flags:
@@ -2289,10 +2280,7 @@ class MoxMetaTestBase(type):
     """
 
     def __init__(cls, name, bases, d):
-        if six.PY3:  # pragma: nocover
-            super().__init__(name, bases, d)
-        else:
-            super(MoxMetaTestBase, cls).__init__(name, bases, d)
+        super().__init__(name, bases, d)
         # type.__init__(cls, name, bases, d)
 
         # also get all the attributes from the base classes to account

@@ -26,7 +26,7 @@ See mox_test.MoxTestBaseTest for how this class is actually used.
 """
 
 import os
-import six
+
 import mox
 
 
@@ -39,38 +39,38 @@ class ExampleMoxTestMixin(object):
     """
 
     def testStat(self):
-        self.mox.StubOutWithMock(os, 'stat')
+        self.mox.StubOutWithMock(os, "stat")
         os.stat(self.DIR_PATH)
         self.mox.ReplayAll()
         os.stat(self.DIR_PATH)
 
 
 class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
-    DIR_PATH = '/path/to/some/directory'
+    DIR_PATH = "/path/to/some/directory"
 
     def testSuccess(self):
-        self.mox.StubOutWithMock(os, 'listdir')
+        self.mox.StubOutWithMock(os, "listdir")
         os.listdir(self.DIR_PATH)
         self.mox.ReplayAll()
         os.listdir(self.DIR_PATH)
 
     def testExpectedNotCalled(self):
-        self.mox.StubOutWithMock(os, 'listdir')
+        self.mox.StubOutWithMock(os, "listdir")
         os.listdir(self.DIR_PATH)
         self.mox.ReplayAll()
 
     def testUnexpectedCall(self):
-        self.mox.StubOutWithMock(os, 'listdir')
+        self.mox.StubOutWithMock(os, "listdir")
         os.listdir(self.DIR_PATH)
         self.mox.ReplayAll()
-        os.listdir('/path/to/some/other/directory')
+        os.listdir("/path/to/some/other/directory")
         os.listdir(self.DIR_PATH)
 
     def testFailure(self):
         self.assertTrue(False)
 
     def testStatOther(self):
-        self.mox.StubOutWithMock(os, 'stat')
+        self.mox.StubOutWithMock(os, "stat")
         os.stat(self.DIR_PATH)
         self.mox.ReplayAll()
         os.stat(self.DIR_PATH)
@@ -81,14 +81,14 @@ class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
         def MockListdir(directory):
             listdir_list.append(directory)
 
-        self.stubs.Set(os, 'listdir', MockListdir)
+        self.stubs.Set(os, "listdir", MockListdir)
         os.listdir(self.DIR_PATH)
         self.assertEqual([self.DIR_PATH], listdir_list)
 
     def testRaisesWithStatement(self):
-        self.mox.StubOutWithMock(CallableClass, 'decision')
+        self.mox.StubOutWithMock(CallableClass, "decision")
 
-        CallableClass.decision().AndReturn('raise')
+        CallableClass.decision().AndReturn("raise")
 
         self.mox.ReplayAll()
         with self.assertRaises(Exception):
@@ -101,7 +101,7 @@ class TestClassFromAnotherModule(object):
         return None
 
     def Value(self):
-        return 'Not mock'
+        return "Not mock"
 
 
 class ChildClassFromAnotherModule(TestClassFromAnotherModule):
@@ -116,23 +116,25 @@ class ChildClassFromAnotherModule(TestClassFromAnotherModule):
 
 
 class MetaClassFromAnotherModule(type):
-
     def __new__(mcs, name, bases, attrs):
         new_class = super(MetaClassFromAnotherModule, mcs).__new__(
-            mcs, name, bases, attrs)
+            mcs, name, bases, attrs
+        )
 
-        new_class.x = 'meta'
+        new_class.x = "meta"
         return new_class
 
 
-class ChildClassWithMetaClass(six.with_metaclass(MetaClassFromAnotherModule,
-                              TestClassFromAnotherModule)):
+class ChildClassWithMetaClass(
+    TestClassFromAnotherModule, metaclass=MetaClassFromAnotherModule
+):
     """A child class with MetaClassFromAnotherModule.
 
     Used to test corner cases usually only happening with meta classes.
     """
+
     def Value():
-        return 'Not mock'
+        return "Not mock"
 
     def __init__(self, kw=None):
         super(ChildClassWithMetaClass, self).__init__()
@@ -143,18 +145,18 @@ class CallableClass(object):
         pass
 
     def __call__(self, one):
-        return 'Not mock'
+        return "Not mock"
 
     def Value():
-        return 'Not mock'
+        return "Not mock"
 
     def decision(self):
         return
 
     def conditional_function(self):
         decision = self.decision()
-        if decision == 'raise':
-            raise Exception('exception raised')
+        if decision == "raise":
+            raise Exception("exception raised")
 
 
 try:
@@ -169,12 +171,12 @@ try:
         pass
 
     class CallableSubclassOfMyDictABC(MyDictABC):
-
         def __call__(self, one):
-            return 'Not mock'
+            return "Not mock"
 
         def __getitem__(self, key, default=None):
-            return 'Not mock'
+            return "Not mock"
+
 except ImportError:
     pass  # Python 2.5 or earlier
 
@@ -184,13 +186,13 @@ def MyTestFunction(one, two, nine=None):
 
 
 class ExampleClass(object):
-    def __init__(self, foo='bar'):
+    def __init__(self, foo="bar"):
         pass
 
     def TestMethod(self, one, two, nine=None):
         pass
 
-    def NamedParams(self, ignore, foo='bar', baz='qux'):
+    def NamedParams(self, ignore, foo="bar", baz="qux"):
         pass
 
     def SpecialArgs(self, *args, **kwargs):
@@ -202,7 +204,6 @@ class ExampleClass(object):
 
 
 class SpecialClass(object):
-
     @classmethod
     def ClassMethod(cls):
         pass
