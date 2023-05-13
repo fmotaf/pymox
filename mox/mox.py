@@ -106,9 +106,7 @@ class ExpectedMethodCallsError(Error):
         self._expected_methods = expected_methods
 
     def __str__(self):
-        calls = "\n".join(
-            ["%3d.  %s" % (i, m) for i, m in enumerate(self._expected_methods)]
-        )
+        calls = "\n".join(["%3d.  %s" % (i, m) for i, m in enumerate(self._expected_methods)])
         return "Verify: Expected methods never called:\n%s" % (calls,)
 
 
@@ -136,9 +134,7 @@ class UnexpectedMethodCallError(Error):
             self._str = "Unexpected method call %s" % (unexpected_method,)
         else:
             differ = difflib.Differ()
-            diff = differ.compare(
-                str(unexpected_method).splitlines(True), str(expected).splitlines(True)
-            )
+            diff = differ.compare(str(unexpected_method).splitlines(True), str(expected).splitlines(True))
             self._str = "Unexpected method call.  unexpected:-  expected:+\n%s" % (
                 "\n".join(line.rstrip() for line in diff),
             )
@@ -163,10 +159,7 @@ class UnknownMethodCallError(Error):
         self._unknown_method_name = unknown_method_name
 
     def __str__(self):
-        return (
-            "Method called is not a member of the object: %s"
-            % self._unknown_method_name
-        )
+        return "Method called is not a member of the object: %s" % self._unknown_method_name
 
 
 class PrivateAttributeError(Error):
@@ -179,10 +172,7 @@ class PrivateAttributeError(Error):
         self._attr = attr
 
     def __str__(self):
-        return (
-            "Attribute '%s' is private and should not be available in a "
-            " mock object." % self._attr
-        )
+        return "Attribute '%s' is private and should not be available in a " " mock object." % self._attr
 
 
 class ExpectedMockCreationError(Error):
@@ -205,9 +195,7 @@ class ExpectedMockCreationError(Error):
         self._expected_mocks = expected_mocks
 
     def __str__(self):
-        mocks = "\n".join(
-            ["%3d.  %s" % (i, m) for i, m in enumerate(self._expected_mocks)]
-        )
+        mocks = "\n".join(["%3d.  %s" % (i, m) for i, m in enumerate(self._expected_mocks)])
         return "Verify: Expected mocks never created:\n%s" % (mocks,)
 
 
@@ -233,9 +221,7 @@ class UnexpectedMockCreationError(Error):
         error = "Unexpected mock creation: %s(%s" % (self._instance, args)
 
         if self._named_params:
-            error += ", " + ", ".join(
-                ["%s=%s" % (k, v) for k, v in self._named_params.items()]
-            )
+            error += ", " + ", ".join(["%s=%s" % (k, v) for k, v in self._named_params.items()])
 
         error += ")"
         return error
@@ -262,10 +248,7 @@ class SwallowedExceptionError(Error):
 
     def __str__(self):
         exceptions = "\n".join(
-            [
-                "%3d.  %s: %s" % (i, e.__class__.__name__, e)
-                for i, e in enumerate(self._previous_exceptions)
-            ]
+            ["%3d.  %s: %s" % (i, e.__class__.__name__, e) for i, e in enumerate(self._previous_exceptions)]
         )
         return "Previous exceptions thrown:\n%s" % (exceptions,)
 
@@ -369,10 +352,7 @@ class Mox(object):
         attr_type = type(attr_to_replace)
 
         if attr_type == MockAnything or attr_type == MockObject:
-            raise TypeError(
-                "Cannot mock a MockAnything! Did you remember to "
-                "call UnsetStubs in your previous test?"
-            )
+            raise TypeError("Cannot mock a MockAnything! Did you remember to " "call UnsetStubs in your previous test?")
 
         if (
             attr_type in self._USE_MOCK_OBJECT
@@ -430,10 +410,7 @@ class Mox(object):
         attr_type = type(attr_to_replace)
 
         if attr_type == MockAnything or attr_type == MockObject:
-            raise TypeError(
-                "Cannot mock a MockAnything! Did you remember to "
-                "call UnsetStubs in your previous test?"
-            )
+            raise TypeError("Cannot mock a MockAnything! Did you remember to " "call UnsetStubs in your previous test?")
 
         if not inspect.isclass(attr_to_replace):
             raise TypeError("Given attr is not a Class.  Use StubOutWithMock.")
@@ -606,9 +583,7 @@ class MockAnything:
         # If the list of expected calls is not empty, raise an exception
         if self._expected_calls_queue:
             # The last MultipleTimesGroup is not popped from the queue.
-            is_multiple_times_group = isinstance(
-                self._expected_calls_queue[0], MultipleTimesGroup
-            )
+            is_multiple_times_group = isinstance(self._expected_calls_queue[0], MultipleTimesGroup)
 
             if (
                 len(self._expected_calls_queue) == 1
@@ -670,30 +645,21 @@ class MockObject(MockAnything, object):
                 self._description = "{}.{}".format(class_name, method_name)
             else:
                 search_string = (
-                    "<(?P<extra>function|((un)?bound )?method) (?P<class>\w*)"
-                    "(\.(?P<method>\w*))?( at \w+)?>"
+                    r"<(?P<extra>function|((un)?bound )?method) (?P<class>\w*)" r"(\.(?P<method>\w*))?( at \w+)?>"
                 )
                 search = re_search(search_string, str(repr(class_to_mock)))
 
-                self._description = "{}.{}".format(
-                    search.group("class"), search.group("method")
-                )
+                self._description = "{}.{}".format(search.group("class"), search.group("method"))
 
-                if (
-                    search.group("extra") == "function"
-                    and not search.group("class")
-                    or not search.group("method")
-                ):
+                if search.group("extra") == "function" and not search.group("class") or not search.group("method"):
                     to_use = search.group("class") or search.group("method")
                     if inspect.isfunction(self._class_to_mock):
-                        self._description = "function {}.{}".format(
-                            self._class_to_mock.__module__, to_use
-                        )
+                        self._description = "function {}.{}".format(self._class_to_mock.__module__, to_use)
         except Exception:
             try:
                 self._description = type(class_to_mock).__name__
             except Exception:
-                pass
+                self._description = "Unknown description"
 
         for method in dir(class_to_mock):
             try:
@@ -713,9 +679,7 @@ class MockObject(MockAnything, object):
             if attr.startswith("_"):
                 raise PrivateAttributeError(attr)
             elif attr in self._known_methods:
-                raise ValueError(
-                    "'%s' is a method of '%s' objects." % (attr, class_to_mock)
-                )
+                raise ValueError("'%s' is a method of '%s' objects." % (attr, class_to_mock))
             else:
                 setattr(self, attr, value)
 
@@ -748,9 +712,7 @@ class MockObject(MockAnything, object):
             return getattr(self._class_to_mock, name)
 
         if name in self._known_methods:
-            return self._CreateMockMethod(
-                name, method_to_mock=getattr(self._class_to_mock, name)
-            )
+            return self._CreateMockMethod(name, method_to_mock=getattr(self._class_to_mock, name))
 
         exception = UnknownMethodCallError(name)
         self._exceptions_thrown.append(exception)
@@ -978,9 +940,7 @@ class _MockObjectFactory(MockObject):
 
         if self._replay_mode:
             if not self._instance_queue:
-                exception = UnexpectedMockCreationError(
-                    self._class_to_mock, *params, **named_params
-                )
+                exception = UnexpectedMockCreationError(self._class_to_mock, *params, **named_params)
                 self._exceptions_thrown.append(exception)
                 raise exception
 
@@ -1018,17 +978,11 @@ class MethodSignatureChecker(object):
             Some methods and functions like built-ins can't be inspected.
         """
         try:
-            self._args, varargs, varkw, defaults = getattr(inspect, "getfullargspec")(
-                method
-            )[:4]
+            self._args, varargs, varkw, defaults = getattr(inspect, "getfullargspec")(method)[:4]
         except TypeError:
             raise ValueError("Could not get argument specification for %r" % (method,))
         self._method = method
-        if (
-            inspect.ismethod(self._method)
-            or ("." in repr(self._method))
-            or (self._args and self._args[0] == "self")
-        ):
+        if inspect.ismethod(self._method) or ("." in repr(self._method)) or (self._args and self._args[0] == "self"):
             self._args = self._args[1:]  # Skip 'self'.
         self._instance = None  # May contain the instance this is bound to.
 
@@ -1039,7 +993,7 @@ class MethodSignatureChecker(object):
             self._default_args = []
         else:
             self._required_args = self._args[: -len(defaults)]
-            self._default_args = self._args[-len(defaults) :]
+            self._default_args = self._args[-len(defaults):]
 
     def _RecordArgumentGiven(self, arg_name, arg_status):
         """Mark an argument as being given.
@@ -1071,9 +1025,7 @@ class MethodSignatureChecker(object):
           AttributeError: the given parameters don't work with the given
           method.
         """
-        arg_status = dict(
-            (a, MethodSignatureChecker._NEEDED) for a in self._required_args
-        )
+        arg_status = dict((a, MethodSignatureChecker._NEEDED) for a in self._required_args)
         for arg in self._default_args:
             arg_status[arg] = MethodSignatureChecker._DEFAULT
 
@@ -1094,35 +1046,29 @@ class MethodSignatureChecker(object):
                 expected = getattr(self._method, "im_class", None)
                 if not expected:
                     search = re_search(
-                        "<(function|method) (?P<class>\w+)\.\w+ at \w+>",
+                        r"<(function|method) (?P<class>\w+)\.\w+ at \w+>",
                         str(repr(self._method)),
                     )
                     if search:
                         class_ = search.group("class")
                         members = dict(inspect.getmembers(self._method))
-                        expected = members.get(
-                            class_, members.get("__globals__", {})
-                        ).get(class_, None)
+                        expected = members.get(class_, members.get("__globals__", {})).get(class_, None)
                 if not expected:
                     search = re_search(
-                        "<(?P<method>((un)?bound method ))(?P<class>\w+)"
-                        "\.\w+ of <?(?P<module>\w+\.)(?P<class2>\w+) object "
-                        "at [A-Za-z0-9]+>?>",
+                        r"<(?P<method>((un)?bound method ))(?P<class>\w+)"
+                        r"\.\w+ of <?(?P<module>\w+\.)(?P<class2>\w+) object "
+                        r"at [A-Za-z0-9]+>?>",
                         str(repr(self._method)),
                     )
 
                     if search:
                         for _, class_ in search.groupdict().items():
                             members = dict(inspect.getmembers(self._method))
-                            expected = members.get(
-                                class_, members.get("__globals__", {})
-                            ).get(class_, None)
+                            expected = members.get(class_, members.get("__globals__", {})).get(class_, None)
                             if expected:
                                 break
                 if not expected:
-                    expected = dict(inspect.getmembers(self._method))[
-                        "__self__"
-                    ].__class__
+                    expected = dict(inspect.getmembers(self._method))["__self__"].__class__
 
                 # Check if the param is an instance of the expected class,
                 # or check equality (useful for checking Comparators).
@@ -1151,8 +1097,7 @@ class MethodSignatureChecker(object):
             except IndexError:
                 if not self._has_varargs:
                     raise AttributeError(
-                        "%s does not take %d or more positional "
-                        "arguments" % (self._method.__name__, i)
+                        "%s does not take %d or more positional " "arguments" % (self._method.__name__, i)
                     )
             else:
                 self._RecordArgumentGiven(arg_name, arg_status)
@@ -1160,20 +1105,13 @@ class MethodSignatureChecker(object):
         # Check each keyword argument.
         for arg_name in named_params:
             if arg_name not in arg_status and not self._has_varkw:
-                raise AttributeError(
-                    "%s is not expecting keyword argument %s"
-                    % (self._method.__name__, arg_name)
-                )
+                raise AttributeError("%s is not expecting keyword argument %s" % (self._method.__name__, arg_name))
             self._RecordArgumentGiven(arg_name, arg_status)
 
         # Ensure all the required arguments have been given.
-        still_needed = [
-            k for k, v in arg_status.items() if v == MethodSignatureChecker._NEEDED
-        ]
+        still_needed = [k for k, v in arg_status.items() if v == MethodSignatureChecker._NEEDED]
         if still_needed:
-            raise AttributeError(
-                "No values given for arguments: %s" % (" ".join(sorted(still_needed)))
-            )
+            raise AttributeError("No values given for arguments: %s" % (" ".join(sorted(still_needed))))
 
 
 class MockMethod(object):
@@ -1275,23 +1213,16 @@ class MockMethod(object):
         """Raise an AttributeError with a helpful message."""
 
         raise AttributeError(
-            'MockMethod has no attribute "%s". '
-            "Did you remember to put your mocks in replay mode?" % name
+            'MockMethod has no attribute "%s". ' "Did you remember to put your mocks in replay mode?" % name
         )
 
     def __iter__(self):
         """Raise a TypeError with a helpful message."""
-        raise TypeError(
-            "MockMethod cannot be iterated. "
-            "Did you remember to put your mocks in replay mode?"
-        )
+        raise TypeError("MockMethod cannot be iterated. " "Did you remember to put your mocks in replay mode?")
 
     def __next__(self):
         """Raise a TypeError with a helpful message."""
-        raise TypeError(
-            "MockMethod cannot be iterated. "
-            "Did you remember to put your mocks in replay mode?"
-        )
+        raise TypeError("MockMethod cannot be iterated. " "Did you remember to put your mocks in replay mode?")
 
     next = __next__
 
@@ -1335,8 +1266,7 @@ class MockMethod(object):
 
     def __str__(self):
         params = ", ".join(
-            [repr(p) for p in self._params or []]
-            + ["%s=%r" % x for x in sorted((self._named_params or {}).items())]
+            [repr(p) for p in self._params or []] + ["%s=%r" % x for x in sorted((self._named_params or {}).items())]
         )
         full_desc = "%s(%s) -> %r" % (self._name, params, self._return_value)
         if self._description:
@@ -1379,7 +1309,8 @@ class MockMethod(object):
         # Remove this method from the tail of the queue so we can add it to a
         # group.
         this_method = self._call_queue.pop()
-        assert this_method == self
+        if this_method != self:
+            raise Error("Current method is not at the end of the call queue.")
 
         # Determine if the tail of the queue is a group, or just a regular
         # ordered mock method.
@@ -1757,9 +1688,8 @@ class Not(Comparator):
           # predicate: a Comparator instance.
         """
 
-        assert isinstance(predicate, Comparator), (
-            "predicate %r must be a" " Comparator." % predicate
-        )
+        if not isinstance(predicate, Comparator):
+            raise Error("predicate %r must be a" " Comparator." % predicate)
         self._predicate = predicate
 
     def equals(self, rhs):

@@ -58,5 +58,6 @@ staticfiles/
 # Pycharm
 .idea/
 
-# Version file
+# Version files
 mox/__version__.py
+.python-version

@@ -7,9 +7,7 @@ def write_toml(filepath="pyproject.toml", reset=True):
         contents = infile.readlines()
 
     version_contents = (
-        f'version = "0.0.0"  # DO NOT CHANGE VERSION HERE\n'
-        if reset
-        else f'version = "{get_version()}"\n'
+        'version = "0.0.0"  # DO NOT CHANGE VERSION HERE\n' if reset else f'version = "{get_version()}"\n'
     )
 
     for line in contents:

@@ -18,6 +18,7 @@ import unittest
 
 import mox
 from mox import stubout
+
 from . import stubout_testee
 
 

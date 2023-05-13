@@ -18,8 +18,9 @@
 #
 import os
 import sys
-from recommonmark.parser import CommonMarkParser
+
 from pkg_resources import get_distribution
+from recommonmark.parser import CommonMarkParser
 
 sys.path.insert(
     0,
