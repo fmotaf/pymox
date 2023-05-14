@@ -10,6 +10,9 @@ Changelog
 * Replaced master branch with main
 * Fixed support to Python 3.3 to 3.5 in dev environment
 * Set up pyproject.toml with Poetry instead of the old setup.py
+* Fixed docs building
+* Removed dependency from six
+* Formatted the code using Black
 
 1.0.0
 ------------------
