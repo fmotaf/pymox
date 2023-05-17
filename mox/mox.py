@@ -431,7 +431,7 @@ class Mox(object):
     ResetAll = reset_all
     StubOutWithMock = stubout
     StubOutClassWithMocks = stubout_class
-    UnsetStubs = lambda s: s.unset_stubs()  # noqa: E731
+    UnsetStubs = unset_stubs
 
 
 def replay(*args):
