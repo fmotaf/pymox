@@ -372,9 +372,9 @@ class Mox(object):
         """Replace a class with a "mock factory" that will create mock objects.
 
         This is useful if the code-under-test directly instantiates
-        dependencies.  Previously some boilder plate was necessary to
+        dependencies.  Previously some boilerplate was necessary to
         create a mock that would act as a factory.  Using
-        StubOutClassWithMocks, once you've stubbed out the class you may
+        stubout_class, once you've stubbed out the class you may
         use the stubbed class as you would any other mock created by mox:
         during the record phase, new mock instances will be created, and
         during replay, the recorded mocks will be returned.
@@ -413,7 +413,7 @@ class Mox(object):
             raise TypeError("Cannot mock a MockAnything! Did you remember to call unset_stubs in your previous test?")
 
         if not inspect.isclass(attr_to_replace):
-            raise TypeError("Given attr is not a Class.  Use StubOutWithMock.")
+            raise TypeError("Given attr is not a Class. Use stubout.")
 
         factory = _MockObjectFactory(attr_to_replace, self)
         self._mock_objects.append(factory)
