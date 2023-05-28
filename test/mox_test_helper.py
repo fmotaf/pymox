@@ -117,17 +117,13 @@ class ChildClassFromAnotherModule(TestClassFromAnotherModule):
 
 class MetaClassFromAnotherModule(type):
     def __new__(mcs, name, bases, attrs):
-        new_class = super(MetaClassFromAnotherModule, mcs).__new__(
-            mcs, name, bases, attrs
-        )
+        new_class = super(MetaClassFromAnotherModule, mcs).__new__(mcs, name, bases, attrs)
 
         new_class.x = "meta"
         return new_class
 
 
-class ChildClassWithMetaClass(
-    TestClassFromAnotherModule, metaclass=MetaClassFromAnotherModule
-):
+class ChildClassWithMetaClass(TestClassFromAnotherModule, metaclass=MetaClassFromAnotherModule):
     """A child class with MetaClassFromAnotherModule.
 
     Used to test corner cases usually only happening with meta classes.
@@ -189,27 +185,27 @@ class ExampleClass(object):
     def __init__(self, foo="bar"):
         pass
 
-    def TestMethod(self, one, two, nine=None):
+    def test_method(self, one, two, nine=None):
         pass
 
-    def NamedParams(self, ignore, foo="bar", baz="qux"):
+    def named_params(self, ignore, foo="bar", baz="qux"):
         pass
 
-    def SpecialArgs(self, *args, **kwargs):
+    def special_args(self, *args, **kwargs):
         pass
 
     @classmethod
-    def ClassMethod(cls):
+    def class_method(cls):
         pass
 
 
 class SpecialClass(object):
     @classmethod
-    def ClassMethod(cls):
+    def class_method(cls):
         pass
 
     @staticmethod
-    def StaticMethod():
+    def static_method():
         pass
 
 
