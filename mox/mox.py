@@ -1501,6 +1501,9 @@ class Is(Comparator):
         return "<is %r (%s)>" % (self._obj, id(self._obj))
 
 
+is_ = Is
+
+
 class IsA(Comparator):
     """This class wraps a basic Python type or class.  It is used to verify
     that a parameter is of the given type or class.
@@ -1559,6 +1562,9 @@ class IsA(Comparator):
     _IsSubClass = _is_subclass
 
 
+is_a = IsA
+
+
 class IsAlmost(Comparator):
     """Comparison class used to check whether a parameter is nearly equal
     to a given value.  Generally useful for floating point numbers.
@@ -1598,6 +1604,9 @@ class IsAlmost(Comparator):
         return str(self._float_value)
 
 
+is_almost = IsAlmost
+
+
 class StrContains(Comparator):
     """Comparison class used to check whether a substring exists in a
     string parameter.  This can be useful in mocking a database with SQL
@@ -1635,6 +1644,9 @@ class StrContains(Comparator):
 
     def __repr__(self):
         return "<str containing '%s'>" % self._search_string
+
+
+str_contains = StrContains
 
 
 class Regex(Comparator):
@@ -1678,6 +1690,9 @@ class Regex(Comparator):
         return s
 
 
+regex = Regex
+
+
 class In(Comparator):
     """Checks whether an item (or key) is in a list (or dict) parameter.
 
@@ -1711,6 +1726,9 @@ class In(Comparator):
 
     def __repr__(self):
         return "<sequence or map containing '%s'>" % str(self._key)
+
+
+in_ = In
 
 
 class Not(Comparator):
@@ -1750,6 +1768,9 @@ class Not(Comparator):
         return "<not '%s'>" % self._predicate
 
 
+not_ = Not
+
+
 class ContainsKeyValue(Comparator):
     """Checks whether a key/value pair is in a dict parameter.
 
@@ -1787,6 +1808,9 @@ class ContainsKeyValue(Comparator):
         )
 
 
+contains_key_value = ContainsKeyValue
+
+
 class ContainsAttributeValue(Comparator):
     """Checks whether a passed parameter contains attributes with a given
     value.
@@ -1818,6 +1842,9 @@ class ContainsAttributeValue(Comparator):
             return getattr(rhs, self._key) == self._value
         except Exception:
             return False
+
+
+contains_attribute_value = ContainsAttributeValue
 
 
 class SameElementsAs(Comparator):
@@ -1878,6 +1905,9 @@ class SameElementsAs(Comparator):
         return "<sequence with same elements as '%s'>" % self._expected_list
 
 
+same_elements_as = SameElementsAs
+
+
 class And(Comparator):
     """Evaluates one or more Comparators on RHS and returns an AND of the
     results.
@@ -1912,6 +1942,9 @@ class And(Comparator):
         return "<AND %s>" % str(self._comparators)
 
 
+and_ = And
+
+
 class Or(Comparator):
     """Evaluates one or more Comparators on RHS and returns an OR of the
     results.
@@ -1944,6 +1977,9 @@ class Or(Comparator):
 
     def __repr__(self):
         return "<OR %s>" % str(self._comparators)
+
+
+or_ = Or
 
 
 class Func(Comparator):
@@ -1990,6 +2026,9 @@ class Func(Comparator):
         return str(self._func)
 
 
+func = Func
+
+
 class IgnoreArg(Comparator):
     """Ignore an argument.
 
@@ -2014,6 +2053,9 @@ class IgnoreArg(Comparator):
 
     def __repr__(self):
         return "<IgnoreArg>"
+
+
+ignore_arg = IgnoreArg
 
 
 class Value(Comparator):
@@ -2044,6 +2086,9 @@ class Value(Comparator):
             return "<Value>"
 
 
+value = Value
+
+
 class Remember(Comparator):
     """Remembers the argument to a value store.
 
@@ -2069,6 +2114,9 @@ class Remember(Comparator):
 
     def __repr__(self):
         return "<Remember %d>" % id(self._value_store)
+
+
+remember = Remember
 
 
 class MethodGroup(object):
