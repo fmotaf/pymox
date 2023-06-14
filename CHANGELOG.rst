@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.2
+------------------
+* Pymox API is now snake_case, with backwards compatibility
+* README is improved, with a tutorial
+
 1.0.1
 ------------------
 * Fixed changelog
