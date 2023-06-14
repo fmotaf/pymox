@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/env python
 #
 # Copyright 2008 Google Inc.
 #
@@ -22,12 +22,12 @@ class StubOutForTesting:
     You want os.path.exists() to always return true during testing.
 
     stubs = StubOutForTesting()
-    stubs.Set(os.path, 'exists', lambda x: 1)
+    stubs.set(os.path, 'exists', lambda x: 1)
       ...
-    stubs.UnsetAll()
+    stubs.unset_all()
 
-    The above changes os.path.exists into a lambda that returns 1.  Once
-    the ... part of the code finishes, the UnsetAll() looks up the old value
+    The above changes os.path.exists into a lambda that returns 1. Once
+    the ... part of the code finishes, the unset_all() looks up the old value
     of os.path.exists and restores it.
 
     """
@@ -37,10 +37,10 @@ class StubOutForTesting:
         self.stubs = []
 
     def __del__(self):
-        self.SmartUnsetAll()
-        self.UnsetAll()
+        self.smart_unset_all()
+        self.unset_all()
 
-    def SmartSet(self, obj, attr_name, new_attr):
+    def smart_set(self, obj, attr_name, new_attr):
         """Replace obj.attr_name with new_attr. This method is smart and works
          at the module, class, and instance level while preserving proper
          inheritance. It will not stub out C types however unless that has
@@ -60,9 +60,7 @@ class StubOutForTesting:
 
          Raises AttributeError if the attribute cannot be found.
         """
-        if inspect.ismodule(obj) or (
-            not inspect.isclass(obj) and attr_name in obj.__dict__
-        ):
+        if inspect.ismodule(obj) or (not inspect.isclass(obj) and attr_name in obj.__dict__):
             orig_obj = obj
             orig_attr = getattr(obj, attr_name)
 
@@ -95,7 +93,7 @@ class StubOutForTesting:
         self.stubs.append((orig_obj, attr_name, orig_attr))
         setattr(orig_obj, attr_name, new_attr)
 
-    def SmartUnsetAll(self):
+    def smart_unset_all(self):
         """Reverses all the SmartSet() calls, restoring things to their
         original definition.  Its okay to call SmartUnsetAll() repeatedly, as
         later calls have no effect if no SmartSet() calls have been made.
@@ -108,7 +106,7 @@ class StubOutForTesting:
 
         self.stubs = []
 
-    def Set(self, parent, child_name, new_child):
+    def set(self, parent, child_name, new_child):
         """Replace child_name's old definition with new_child, in the context
         of the given parent.  The parent could be a module when the child is a
         function at module scope.  Or the parent could be a class when a class'
@@ -131,7 +129,7 @@ class StubOutForTesting:
         self.cache.append((parent, old_child, child_name))
         setattr(parent, child_name, new_child)
 
-    def UnsetAll(self):
+    def unset_all(self):
         """Reverses all the Set() calls, restoring things to their original
         definition.  Its okay to call UnsetAll() repeatedly, as later calls
         have no effect if no Set() calls have been made.
@@ -145,3 +143,11 @@ class StubOutForTesting:
         for parent, old_child, child_name in self.cache:
             setattr(parent, child_name, old_child)
         self.cache = []
+
+    SmartSet = smart_set
+    SmartUnsetAll = smart_unset_all
+    Set = set
+    UnsetAll = unset_all
+
+
+stubout = StubOutForTesting()

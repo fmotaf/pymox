@@ -1,4 +1,3 @@
 class FarAwayClass(object):
-
-    def distantMethod(self):
+    def distant_method(self):
         pass
