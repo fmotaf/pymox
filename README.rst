@@ -167,31 +167,31 @@ call.
 
 .. code:: python
 
-       def test_quack_7(self):  
+       def test_quack_7(self):
            m = mox.Mox()
            duck = Duck()
-           
+
            m.stubout(Duck, 'quack')
-           
+
            def validate_arg(arg):
             if arg in [1, 2, 3]:
              return True
             return False
-           
+
            duck.quack(times=mox.is_a(int)).returns(['new quack'])
            duck.quack(times=mox.not_(mox.is_(4))).returns(['new quack'])
            duck.quack(times=mox.func(validate_arg)).returns(['new quack'])
            duck.quack(times=mox.or_(mox.Is(1), mox.is_(2), mox.is_(3))).returns(['new quack'])
-           
+
            duck.quack(times=mox.ignore_arg()).returns(['new quack'])
            duck.quack(times=mox.is_almost(1.00003, places=4)).returns(['new quack'])
-           
+
            m.replay_all()
            assert duck.quack(times=random.choice([1, 2, 3])) == ['new quack']
            assert duck.quack(times=random.choice([1, 2, 3])) == mox.in_('new quack')
            assert duck.quack(times=random.choice([1, 2, 3]))[0] == mox.str_contains('quack')
            assert duck.quack(times=random.choice([1, 2, 3])) == mox.same_elements_as({'new quack'})
-           
+
            assert duck.quack(times=random.choice([1, 2, 3])) == ['new quack']
            assert duck.quack(times=1) == ['new quack']
            m.verify_all()
@@ -227,7 +227,7 @@ code. See the test below:
            duck = StopQuackingDuck()
 
            m.stubout(StopQuackingDuck, '_do_quack')
-           
+
            choices_1 = mox.value()
            choices_2 = mox.value()
            duck._do_quack(choices=mox.remember(choices_1))
