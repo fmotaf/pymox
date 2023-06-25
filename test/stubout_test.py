@@ -25,23 +25,23 @@ from . import stubout_testee
 class StubOutForTestingTest(unittest.TestCase):
     def setUp(self):
         self.mox = mox.Mox()
-        self.sample_function_backup = stubout_testee.SampleFunction
+        self.sample_function_backup = stubout_testee.sample_function
 
     def tearDown(self):
         stubout_testee.SampleFunction = self.sample_function_backup
 
     def testSmartSetOnModule(self):
-        mock_function = self.mox.CreateMockAnything()
+        mock_function = self.mox.create_mock_anything()
         mock_function()
 
-        stubber = stubout.StubOutForTesting()
-        stubber.SmartSet(stubout_testee, "SampleFunction", mock_function)
+        stubber = stubout.stubout()
+        stubber.smart_set(stubout_testee, "sample_function", mock_function)
 
-        self.mox.ReplayAll()
+        self.mox.replay_all()
 
-        stubout_testee.SampleFunction()
+        stubout_testee.sample_function()
 
-        self.mox.VerifyAll()
+        self.mox.verify_all()
 
 
 if __name__ == "__main__":

@@ -150,4 +150,4 @@ class StubOutForTesting:
     UnsetAll = unset_all
 
 
-stubout = StubOutForTesting()
+stubout = StubOutForTesting

@@ -39,9 +39,9 @@ class ExampleMoxTestMixin(object):
     """
 
     def testStat(self):
-        self.mox.StubOutWithMock(os, "stat")
+        self.mox.stubout(os, "stat")
         os.stat(self.DIR_PATH)
-        self.mox.ReplayAll()
+        self.mox.replay_all()
         os.stat(self.DIR_PATH)
 
 
@@ -49,20 +49,20 @@ class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
     DIR_PATH = "/path/to/some/directory"
 
     def testSuccess(self):
-        self.mox.StubOutWithMock(os, "listdir")
+        self.mox.stubout(os, "listdir")
         os.listdir(self.DIR_PATH)
-        self.mox.ReplayAll()
+        self.mox.replay_all()
         os.listdir(self.DIR_PATH)
 
     def testExpectedNotCalled(self):
-        self.mox.StubOutWithMock(os, "listdir")
+        self.mox.stubout(os, "listdir")
         os.listdir(self.DIR_PATH)
-        self.mox.ReplayAll()
+        self.mox.replay_all()
 
     def testUnexpectedCall(self):
-        self.mox.StubOutWithMock(os, "listdir")
+        self.mox.stubout(os, "listdir")
         os.listdir(self.DIR_PATH)
-        self.mox.ReplayAll()
+        self.mox.replay_all()
         os.listdir("/path/to/some/other/directory")
         os.listdir(self.DIR_PATH)
 
@@ -70,9 +70,9 @@ class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
         self.assertTrue(False)
 
     def testStatOther(self):
-        self.mox.StubOutWithMock(os, "stat")
+        self.mox.stubout(os, "stat")
         os.stat(self.DIR_PATH)
-        self.mox.ReplayAll()
+        self.mox.replay_all()
         os.stat(self.DIR_PATH)
 
     def testHasStubs(self):
@@ -81,16 +81,16 @@ class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
         def MockListdir(directory):
             listdir_list.append(directory)
 
-        self.stubs.Set(os, "listdir", MockListdir)
+        self.stubs.set(os, "listdir", MockListdir)
         os.listdir(self.DIR_PATH)
         self.assertEqual([self.DIR_PATH], listdir_list)
 
     def testRaisesWithStatement(self):
-        self.mox.StubOutWithMock(CallableClass, "decision")
+        self.mox.stubout(CallableClass, "decision")
 
-        CallableClass.decision().AndReturn("raise")
+        CallableClass.decision().returns("raise")
 
-        self.mox.ReplayAll()
+        self.mox.replay_all()
         with self.assertRaises(Exception):
             call = CallableClass(1, 2)
             call.conditional_function()
@@ -100,7 +100,7 @@ class TestClassFromAnotherModule(object):
     def __init__(self):
         return None
 
-    def Value(self):
+    def value(self):
         return "Not mock"
 
 
@@ -129,7 +129,7 @@ class ChildClassWithMetaClass(TestClassFromAnotherModule, metaclass=MetaClassFro
     Used to test corner cases usually only happening with meta classes.
     """
 
-    def Value():
+    def value():
         return "Not mock"
 
     def __init__(self, kw=None):
@@ -143,7 +143,7 @@ class CallableClass(object):
     def __call__(self, one):
         return "Not mock"
 
-    def Value():
+    def value():
         return "Not mock"
 
     def decision(self):

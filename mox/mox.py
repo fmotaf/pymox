@@ -58,7 +58,7 @@ Suggested usage / workflow:
   controller.DeletePersonById('1')
 
   # Verify all methods were called as expected
-  my_mox.VerifyAll()
+  my_mox.verify_all()
 """
 
 try:
@@ -319,19 +319,19 @@ class Mox(object):
         """Set all mock objects to replay mode."""
 
         for mock_obj in self._mock_objects:
-            mock_obj._Replay()
+            mock_obj._replay()
 
     def verify_all(self):
         """Call verify on all mock objects created."""
 
         for mock_obj in self._mock_objects:
-            mock_obj._Verify()
+            mock_obj._verify()
 
     def reset_all(self):
         """Call reset on all mock objects.  This does not unset stubs."""
 
         for mock_obj in self._mock_objects:
-            mock_obj._Reset()
+            mock_obj._reset()
 
     def stubout(self, obj, attr_name, use_mock_anything=False):
         """Replace a method, attribute, etc. with a Mock.
@@ -361,12 +361,12 @@ class Mox(object):
             isinstance(attr_to_replace, object)
             or inspect.isclass(attr_to_replace)
         ) and not use_mock_anything:
-            stub = self.CreateMock(attr_to_replace)
+            stub = self.create_mock(attr_to_replace)
         else:
-            stub = self.CreateMockAnything(description="Stub for %s" % attr_to_replace)
+            stub = self.create_mock_anything(description="Stub for %s" % attr_to_replace)
             stub.__name__ = attr_name
 
-        self.stubs.Set(obj, attr_name, stub)
+        self.stubs.set(obj, attr_name, stub)
 
     def stubout_class(self, obj, attr_name):
         """Replace a class with a "mock factory" that will create mock objects.
@@ -393,7 +393,7 @@ class Mox(object):
 
         my_import.FooClass(1, 2)   # Returns mock1 again.
         my_import.FooClass(9, 10)  # Returns mock2 again.
-        mox.VerifyAll()
+        mox.verify_all()
 
         # Example using StubOutClassWithMocks:
 
@@ -404,7 +404,7 @@ class Mox(object):
 
         my_import.FooClass(1, 2)   # Returns mock1 again.
         my_import.FooClass(9, 10)  # Returns mock2 again.
-        mox.VerifyAll()
+        mox.verify_all()
         """
         attr_to_replace = getattr(obj, attr_name)
         attr_type = type(attr_to_replace)
@@ -417,7 +417,7 @@ class Mox(object):
 
         factory = _MockObjectFactory(attr_to_replace, self)
         self._mock_objects.append(factory)
-        self.stubs.Set(obj, attr_name, factory)
+        self.stubs.set(obj, attr_name, factory)
 
     def unset_stubs(self):
         """Restore stubs to their original state."""
@@ -606,7 +606,7 @@ class MockAnything:
             if (
                 len(self._expected_calls_queue) == 1
                 and is_multiple_times_group
-                and self._expected_calls_queue[0].IsSatisfied()
+                and self._expected_calls_queue[0].is_satisfied()
             ):
                 pass
             else:
@@ -972,7 +972,7 @@ class _MockObjectFactory(MockObject):
         else:
             mock_method(*params, **named_params)
 
-            instance = self._mox.CreateMock(self._class_to_mock)
+            instance = self._mox.create_mock(self._class_to_mock)
             self._instance_queue.appendleft(instance)
             return instance
 
@@ -1017,7 +1017,7 @@ class MethodSignatureChecker(object):
             self._default_args = []
         else:
             self._required_args = self._args[: -len(defaults)]
-            self._default_args = self._args[-len(defaults):]
+            self._default_args = self._args[-len(defaults) :]
 
     def _record_argument_given(self, arg_name, arg_status):
         """Mark an argument as being given.
@@ -1220,11 +1220,11 @@ class MockMethod(object):
 
         if not self._replay_mode:
             if self._checker is not None:
-                self._checker.Check(params, named_params)
+                self._checker.check(params, named_params)
             self._call_queue.append(self)
             return self
 
-        expected_method = self._VerifyMethodCall()
+        expected_method = self._verify_method_call()
 
         if expected_method._side_effects:
             result = expected_method._side_effects(*params, **named_params)
@@ -1274,12 +1274,12 @@ class MockMethod(object):
           UnexpectedMethodCall if the method called was not expected.
         """
 
-        expected = self._PopNextMethod()
+        expected = self._pop_next_method()
 
         # Loop here, because we might have a MethodGroup followed by another
         # group.
         while isinstance(expected, MethodGroup):
-            expected, method = expected.MethodCalled(self)
+            expected, method = expected.method_called(self)
             if method is not None:
                 return method
 
@@ -1363,12 +1363,12 @@ class MockMethod(object):
 
         # If this is a group, and it is the correct group, add the method.
         if isinstance(group, group_class) and group.group_name() == group_name:
-            group.AddMethod(self)
+            group.add_method(self)
             return self
 
         # Create a new group and add the method.
         new_group = group_class(group_name, self._exception_list)
-        new_group.AddMethod(self)
+        new_group.add_method(self)
         self._call_queue.append(new_group)
         return self
 
@@ -2212,7 +2212,7 @@ class UnorderedGroup(MethodGroup):
 
                 # If this group is not empty, put it back at the head of the
                 # queue.
-                if not self.IsSatisfied():
+                if not self.is_satisfied():
                     mock_method._call_queue.appendleft(self)
 
                 return self, method
@@ -2282,8 +2282,8 @@ class MultipleTimesGroup(MethodGroup):
                 mock_method._call_queue.appendleft(self)
                 return self, method
 
-        if self.IsSatisfied():
-            next_method = mock_method._PopNextMethod()
+        if self.is_satisfied():
+            next_method = mock_method._pop_next_method()
             return next_method, None
         else:
             exception = UnexpectedMethodCallError(mock_method, self)
@@ -2353,12 +2353,12 @@ class MoxMetaTestBase(type):
                 func(self, *args, **kwargs)
             finally:
                 if cleanup_mox:
-                    mox_obj.UnsetStubs()
+                    mox_obj.unset_stubs()
                 if cleanup_stubout:
-                    stubout_obj.UnsetAll()
-                    stubout_obj.SmartUnsetAll()
+                    stubout_obj.unset_all()
+                    stubout_obj.smart_unset_all()
             if cleanup_mox:
-                mox_obj.VerifyAll()
+                mox_obj.verify_all()
 
         new_method.__name__ = func.__name__
         new_method.__doc__ = func.__doc__
