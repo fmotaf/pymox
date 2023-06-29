@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Python imports
 import unittest
 
+# Internal imports
 import mox
 from mox import stubout
 

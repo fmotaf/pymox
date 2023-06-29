@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+# Python imports
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -19,8 +20,10 @@
 import os
 import sys
 
+# Pip imports
 from pkg_resources import get_distribution
 from recommonmark.parser import CommonMarkParser
+
 
 sys.path.insert(
     0,
@@ -92,6 +95,7 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 if not os.environ.get('READTHEDOCS', None):
+    # Pip imports
     import sphinx_rtd_theme
 
     html_theme = 'sphinx_rtd_theme'

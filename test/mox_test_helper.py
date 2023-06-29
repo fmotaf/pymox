@@ -25,8 +25,10 @@ mox_test.py test suite.
 See mox_test.MoxTestBaseTest for how this class is actually used.
 """
 
+# Python imports
 import os
 
+# Internal imports
 import mox
 
 
@@ -156,6 +158,7 @@ class CallableClass(object):
 
 
 try:
+    # Python imports
     import abc
 
     class MyDictABC(object):
