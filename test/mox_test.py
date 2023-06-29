@@ -15,15 +15,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Python imports
 import io
 import re
 import sys
 import unittest
 
-from mox import mox
+# Internal imports
+import mox
 
 from . import mox_test_helper
 from .test_helpers.subpackage.faraway import FarAwayClass
+
 
 OS_LISTDIR = mox_test_helper.os.listdir
 
@@ -2099,6 +2102,7 @@ class MoxTest(unittest.TestCase):
         self.assertEqual("meta", one.x)
 
     try:
+        # Python imports
         import abc
 
         # I'd use the unittest skipping decorators for this but I want to
@@ -2580,7 +2584,7 @@ class MyTestCase(unittest.TestCase):
         self.another_critical_variable += 1
 
 
-class MoxTestBaseMultipleInheritanceTest(mox.MoxTestBase, MyTestCase):
+class MoxTestBaseMultipleInheritanceTest(mox.testing.MoxTestBase, MyTestCase):
     """Test that multiple inheritance can be used with MoxTestBase."""
 
     def setUp(self):

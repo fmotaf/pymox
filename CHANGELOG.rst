@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.1.0
+------------------
+* Python 3.3 and 3.4 are (finally!) no longer supported
+* Most of the code is snake_case.
+* Reorganized project with new modules: ``comparators``, ``exceptions``, ``groups`` and ``testing``.
+
 1.0.2
 ------------------
 * Pymox API is now snake_case, with backwards compatibility
