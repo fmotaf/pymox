@@ -75,3 +75,33 @@ addopts = [
     "term-missing",
     "test/mox_test.py"
 ]
+
+
+[tool.black]
+line-length = 120
+target-version = [ "py35" ]
+
+
+[tool.isort]
+atomic = true
+case_sensitive = true
+filter_files = true
+import_heading_firstparty = "Internal imports"
+import_heading_stdlib = "Python imports"
+import_heading_thirdparty = "Pip imports"
+known_startup = [
+  "startup",
+]
+line_length = 120
+lines_after_imports = 2
+profile = "black"
+py_version = "auto"
+remove_redundant_aliases = true
+sections = [
+  "FUTURE",
+  "STARTUP",
+  "STDLIB",
+  "THIRDPARTY",
+  "FIRSTPARTY",
+  "LOCALFOLDER",
+]
