@@ -109,9 +109,8 @@ class Mox(object):
         getattr(types, "ClassType", type),
         getattr(types, "ObjectType", object),
         getattr(types, "TypeType", type),
+        abc.ABCMeta,
     ]
-    if abc:
-        _USE_MOCK_FACTORY.append(abc.ABCMeta)
 
     def __init__(self):
         """Initialize a new Mox."""

@@ -585,8 +585,7 @@ class MockMethodTest(unittest.TestCase):
         self.assertEqual(self.mock_method, expected_method)
 
     def test_equality_named_params_not_equal(self):
-        """Methods with the same name and diffnamed params should not be
-        equal."""
+        """Methods with the same name and diff named params should not be equal."""
         expected_method = mox.MockMethod("test_method", [], [], False)
         expected_method._named_params = {"input1": "test", "input2": "params"}
 
@@ -722,7 +721,7 @@ class MockAnythingTest(unittest.TestCase):
 
     def test_equal_mock_failure(self):
         """Verify equals identifies unequal objects."""
-        self.mock_object.SillyCall()
+        self.mock_object.silly_call()
         self.mock_object._replay()
         self.assertNotEqual(self.mock_object, mox.MockAnything())
 
@@ -738,20 +737,20 @@ class MockAnythingTest(unittest.TestCase):
 
     def test_nested_mock_calls_recorded_serially(self):
         """Test that nested calls work when recorded serially."""
-        self.mock_object.CallInner().returns(1)
-        self.mock_object.CallOuter(1)
+        self.mock_object.call_inner().returns(1)
+        self.mock_object.call_outer(1)
         self.mock_object._replay()
 
-        self.mock_object.CallOuter(self.mock_object.CallInner())
+        self.mock_object.call_outer(self.mock_object.call_inner())
 
         self.mock_object._verify()
 
     def test_nested_mock_calls_recorded_nested(self):
         """Test that nested cals work when recorded in a nested fashion."""
-        self.mock_object.CallOuter(self.mock_object.CallInner().returns(1))
+        self.mock_object.call_outer(self.mock_object.call_inner().returns(1))
         self.mock_object._replay()
 
-        self.mock_object.CallOuter(self.mock_object.CallInner())
+        self.mock_object.call_outer(self.mock_object.call_inner())
 
         self.mock_object._verify()
 
@@ -923,7 +922,7 @@ class CheckCallTestClass(object):
 
 
 class MockObjectTest(unittest.TestCase):
-    """Verify that the MockObject class works as exepcted."""
+    """Verify that the MockObject class works as expected."""
 
     def setUp(self):
         self.mock_object = mox.MockObject(TestClass)
@@ -1162,7 +1161,7 @@ class MockObjectTest(unittest.TestCase):
                 self.my_dict = {}
 
             def __setitem__(self, key, value):
-                self.my_dict[key], value
+                self.my_dict[key] = value
 
         class TestSubClass(NewStyleTestClass):
             pass
@@ -2192,10 +2191,10 @@ class MoxTest(unittest.TestCase):
         self.assertRaises(AttributeError, mox_test_helper.MyTestFunction, 1)
         self.mox.unset_stubs()
 
-    def _test_method_signature_verification(self, stubClass):
-        # If stubClass is true, the test is run against an a stubbed out class,
+    def _test_method_signature_verification(self, stub_class):
+        # If stub_class is true, the test is run against an a stubbed out class,
         # else the test is run against a stubbed out instance.
-        if stubClass:
+        if stub_class:
             self.mox.stubout(mox_test_helper.ExampleClass, "test_method")
             obj = mox_test_helper.ExampleClass()
         else:
@@ -2211,10 +2210,10 @@ class MoxTest(unittest.TestCase):
         self.mox.unset_stubs()
 
     def test_stub_out_class_method_verifies_signature(self):
-        self._test_method_signature_verification(stubClass=True)
+        self._test_method_signature_verification(stub_class=True)
 
     def test_stub_out_object_method_verifies_signature(self):
-        self._test_method_signature_verification(stubClass=False)
+        self._test_method_signature_verification(stub_class=False)
 
     def test_stub_out_object(self):
         """Test that object is replaced with a Mock."""
@@ -2443,36 +2442,35 @@ class MoxTestBaseTest(unittest.TestCase):
 
     def test_success(self):
         """Successful test method execution test."""
-        self._create_test("testSuccess")
+        self._create_test("test_success")
         self._verify_success()
 
     def test_success_no_mocks(self):
-        """Let testSuccess() unset all the mocks, and verify they've been
-        unset."""
-        self._create_test("testSuccess")
+        """Let test_success() unset all the mocks, and verify they've been unset."""
+        self._create_test("test_success")
         self.test.run(result=self.result)
         self.assertTrue(self.result.wasSuccessful())
         self.assertEqual(OS_LISTDIR, mox_test_helper.os.listdir)
 
     def test_stubs(self):
         """Test that "self.stubs" is provided as is useful."""
-        self._create_test("testHasStubs")
+        self._create_test("test_has_stubs")
         self._verify_success()
 
     def test_raises_with_statement(self):
-        self._create_test("testRaisesWithStatement")
+        self._create_test("test_raises_with_statement")
         self._verify_success()
 
     def test_stubs_no_mocks(self):
-        """Let testHasStubs() unset the stubs by itself."""
-        self._create_test("testHasStubs")
+        """Let test_has_stubs() unset the stubs by itself."""
+        self._create_test("test_has_stubs")
         self.test.run(result=self.result)
         self.assertTrue(self.result.wasSuccessful())
         self.assertEqual(OS_LISTDIR, mox_test_helper.os.listdir)
 
     def test_expected_not_called(self):
         """Stubbed out method is not called."""
-        self._create_test("testExpectedNotCalled")
+        self._create_test("test_expected_not_called")
         self.mox.stubout(self.test_mox, "unset_stubs")
         self.mox.stubout(self.test_stubs, "unset_all")
         self.mox.stubout(self.test_stubs, "smart_unset_all")
@@ -2486,15 +2484,15 @@ class MoxTestBaseTest(unittest.TestCase):
         self.mox.verify_all()
 
     def test_expected_not_called_no_mocks(self):
-        """Let testExpectedNotCalled() unset all the mocks by itself."""
-        self._create_test("testExpectedNotCalled")
+        """Let test_expected_not_called() unset all the mocks by itself."""
+        self._create_test("test_expected_not_called")
         self.test.run(result=self.result)
         self.assertFalse(self.result.wasSuccessful())
         self.assertEqual(OS_LISTDIR, mox_test_helper.os.listdir)
 
     def test_unexpected_call(self):
         """Stubbed out method is called with unexpected arguments."""
-        self._create_test("testUnexpectedCall")
+        self._create_test("test_unexpected_call")
         self.mox.stubout(self.test_mox, "unset_stubs")
         self.mox.stubout(self.test_stubs, "unset_all")
         self.mox.stubout(self.test_stubs, "smart_unset_all")
@@ -2510,7 +2508,7 @@ class MoxTestBaseTest(unittest.TestCase):
 
     def test_failure(self):
         """Failing assertion in test method."""
-        self._create_test("testFailure")
+        self._create_test("test_failure")
         self.mox.stubout(self.test_mox, "unset_stubs")
         self.mox.stubout(self.test_stubs, "unset_all")
         self.mox.stubout(self.test_stubs, "smart_unset_all")
@@ -2526,7 +2524,7 @@ class MoxTestBaseTest(unittest.TestCase):
 
     def test_mixin(self):
         """Run test from mix-in test class, ensure it passes."""
-        self._create_test("testStat")
+        self._create_test("test_stat")
         self._verify_success()
 
     def test_mixin_again(self):
@@ -2535,7 +2533,7 @@ class MoxTestBaseTest(unittest.TestCase):
         This ensures metaclass properly wrapped test methods from all base
         classes. If unsetting of stubs doesn't happen, this will fail.
         """
-        self._create_test("testStatOther")
+        self._create_test("test_stat_other")
         self._verify_success()
 
 
@@ -2545,8 +2543,7 @@ class VerifyTest(unittest.TestCase):
     def test_verify(self):
         """Verify should be called for all objects.
 
-        This should throw an exception because the expected behavior did not
-        occur."""
+        This should throw an exception because the expected behavior did not occur."""
         mock_obj = mox.MockObject(TestClass)
         mock_obj.valid_call()
         mock_obj._replay()

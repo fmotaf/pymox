@@ -24,8 +24,8 @@ mox_test.py test suite.
 
 See mox_test.MoxTestBaseTest for how this class is actually used.
 """
-
 # Python imports
+import abc
 import os
 
 # Internal imports
@@ -40,7 +40,7 @@ class ExampleMoxTestMixin(object):
     test methods in all base classes.
     """
 
-    def testStat(self):
+    def test_stat(self):
         self.mox.stubout(os, "stat")
         os.stat(self.DIR_PATH)
         self.mox.replay_all()
@@ -50,44 +50,44 @@ class ExampleMoxTestMixin(object):
 class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
     DIR_PATH = "/path/to/some/directory"
 
-    def testSuccess(self):
+    def test_success(self):
         self.mox.stubout(os, "listdir")
         os.listdir(self.DIR_PATH)
         self.mox.replay_all()
         os.listdir(self.DIR_PATH)
 
-    def testExpectedNotCalled(self):
+    def test_expected_not_called(self):
         self.mox.stubout(os, "listdir")
         os.listdir(self.DIR_PATH)
         self.mox.replay_all()
 
-    def testUnexpectedCall(self):
+    def test_unexpected_call(self):
         self.mox.stubout(os, "listdir")
         os.listdir(self.DIR_PATH)
         self.mox.replay_all()
         os.listdir("/path/to/some/other/directory")
         os.listdir(self.DIR_PATH)
 
-    def testFailure(self):
+    def test_failure(self):
         self.assertTrue(False)
 
-    def testStatOther(self):
+    def test_stat_other(self):
         self.mox.stubout(os, "stat")
         os.stat(self.DIR_PATH)
         self.mox.replay_all()
         os.stat(self.DIR_PATH)
 
-    def testHasStubs(self):
+    def test_has_stubs(self):
         listdir_list = []
 
-        def MockListdir(directory):
+        def mock_listdir(directory):
             listdir_list.append(directory)
 
-        self.stubs.set(os, "listdir", MockListdir)
+        self.stubs.set(os, "listdir", mock_listdir)
         os.listdir(self.DIR_PATH)
         self.assertEqual([self.DIR_PATH], listdir_list)
 
-    def testRaisesWithStatement(self):
+    def test_raises_with_statement(self):
         self.mox.stubout(CallableClass, "decision")
 
         CallableClass.decision().returns("raise")
@@ -157,27 +157,22 @@ class CallableClass(object):
             raise Exception("exception raised")
 
 
+class MyDictABC(object):
+    __metaclass__ = abc.ABCMeta
+
+
 try:
-    # Python imports
-    import abc
+    MyDictABC.register(dict)
+except AttributeError:
+    pass
 
-    class MyDictABC(object):
-        __metaclass__ = abc.ABCMeta
 
-    try:
-        MyDictABC.register(dict)
-    except AttributeError:
-        pass
+class CallableSubclassOfMyDictABC(MyDictABC):
+    def __call__(self, one):
+        return "Not mock"
 
-    class CallableSubclassOfMyDictABC(MyDictABC):
-        def __call__(self, one):
-            return "Not mock"
-
-        def __getitem__(self, key, default=None):
-            return "Not mock"
-
-except ImportError:
-    pass  # Python 2.5 or earlier
+    def __getitem__(self, key, default=None):
+        return "Not mock"
 
 
 def MyTestFunction(one, two, nine=None):
