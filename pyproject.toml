@@ -42,7 +42,7 @@ keywords = [
 readme = "README.rst"
 
 [tool.poetry.dependencies]
-python = ">=3.3, <4"
+python = ">=3.5, <4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = [
@@ -105,3 +105,6 @@ sections = [
   "FIRSTPARTY",
   "LOCALFOLDER",
 ]
+
+[tool.bandit.assert_used]
+excludes = ['*_test.py', '*/test_*.py']
