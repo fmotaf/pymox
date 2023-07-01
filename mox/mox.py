@@ -60,7 +60,16 @@ Suggested usage / workflow:
   # Verify all methods were called as expected
   my_mox.verify_all()
 """
+# Python imports
+import abc
+import inspect
+import types
+from collections import deque
+from re import search as re_search
+
+from . import stubout
 from .comparators import IsA
+from .contextmanagers import Create, Expect, MockObjectExpect
 from .exceptions import (
     Error,
     ExpectedMethodCallsError,
@@ -74,21 +83,13 @@ from .exceptions import (
 from .groups import MethodGroup, MultipleTimesGroup, UnorderedGroup
 
 
-try:
-    # Python imports
-    import abc
-except ImportError:
-    abc = None  # Python 2.5 and earlier
-# Python imports
-import inspect
-import types
-from collections import deque
-from re import search as re_search
-
-from . import stubout
+class MoxPropertyMeta(type):
+    @property
+    def create(cls):
+        return Create(cls())
 
 
-class Mox(object):
+class Mox(object, metaclass=MoxPropertyMeta):
     """Mox: a factory for creating mock objects."""
 
     # A list of types that should be stubbed out with MockObjects (as
@@ -257,6 +258,10 @@ class Mox(object):
         """Restore stubs to their original state."""
 
         self.stubs.unset_all()
+
+    @property
+    def expect(self):
+        return Expect(mox_obj=self)
 
     CreateMock = create_mock
     CreateMockAnything = create_mock_anything
@@ -563,6 +568,9 @@ class MockObject(MockAnything, object):
           UnknownMethodCallError if the MockObject does not mock the requested
               method.
         """
+
+        if name == "_expect":
+            return MockObjectExpect(self)
 
         if name in self._known_vars:
             return getattr(self._class_to_mock, name)
