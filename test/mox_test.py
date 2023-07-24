@@ -1003,6 +1003,19 @@ class MockObjectTest(unittest.TestCase):
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
 
+    def test_mox_id(self):
+        mock = mox.MockObject(TestClass)
+        assert mock._mox_id is None
+
+        mock = mox.MockObject(TestClass, _mox_id=id(self.mock))
+        assert mock._mox_id == id(self.mock)
+
+        mock_anything = mox.MockAnything()
+        assert mock_anything._mox_id is None
+
+        mock_anything = mox.MockAnything(_mox_id=id(self.mock))
+        assert mock_anything._mox_id == id(self.mock)
+
     def test_setup_mode_with_valid_call(self):
         """Verify the mock object properly mocks a basic method call."""
         self.mock_object.valid_call()
@@ -1853,6 +1866,13 @@ class MoxTest(unittest.TestCase):
         ret_val = mock_obj.valid_call()
         self.assertEqual("yes", ret_val)
         self.mox.verify_all()
+
+    def test_mox_id(self):
+        mock = self.mox.create_mock(mox_test_helper.SpecialClass)
+        assert mock._mox_id == id(self.mox)
+
+        mock_anything = self.mox.create_mock_anything()
+        assert mock_anything._mox_id == id(self.mox)
 
     def test_signature_matching_with_comparator_as_first_arg(self):
         """Test that the first argument can be a comparator."""

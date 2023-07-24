@@ -133,7 +133,7 @@ class Mox(object, metaclass=MoxPropertyMeta):
         """
         if attrs is None:
             attrs = {}
-        new_mock = MockObject(class_to_mock, attrs=attrs)
+        new_mock = MockObject(class_to_mock, attrs=attrs, _mox_id=id(self))
         self._mock_objects.append(new_mock)
         return new_mock
 
@@ -146,7 +146,7 @@ class Mox(object, metaclass=MoxPropertyMeta):
           description: str. Optionally, a descriptive name for the mock object
             being created, for debugging output purposes.
         """
-        new_mock = MockAnything(description=description)
+        new_mock = MockAnything(description=description, _mox_id=id(self))
         self._mock_objects.append(new_mock)
         return new_mock
 
@@ -321,7 +321,7 @@ class MockAnything:
     This is helpful for mocking classes that do not provide a public interface.
     """
 
-    def __init__(self, description=None):
+    def __init__(self, description=None, _mox_id=None):
         """Initialize a new MockAnything.
 
         Args:
@@ -330,6 +330,7 @@ class MockAnything:
         """
         self._description = description
         self._exceptions_thrown = []
+        self._mox_id = _mox_id
         self._reset()
 
     def __bases__(self):
@@ -468,7 +469,7 @@ class MockAnything:
 class MockObject(MockAnything, object):
     """A mock object that simulates the public/protected interface of a class."""
 
-    def __init__(self, class_to_mock, attrs=None):
+    def __init__(self, class_to_mock, attrs=None, _mox_id=None):
         """Initialize a mock object.
 
         This determines the methods and properties of the class and stores
@@ -489,7 +490,7 @@ class MockObject(MockAnything, object):
 
         # This is used to hack around the mixin/inheritance of MockAnything,
         # which is not a proper object (it can be anything. :-)
-        MockAnything.__dict__["__init__"](self)
+        MockAnything.__dict__["__init__"](self, _mox_id=_mox_id)
 
         # Get a list of all the public and special methods we should mock.
         self._known_methods = set()
