@@ -1797,6 +1797,57 @@ class MockObjectContextManagerTest(unittest.TestCase):
         dummy._verify()
 
 
+class TestMoxMeta:
+    def test_context_managers(self):
+        m = mox.Mox()
+        assert type(mox.Mox.create) == mox.contextmanagers.Create
+        assert type(m.expect) == mox.contextmanagers.Expect
+
+    def test_instances(self):
+        m1 = mox.Mox()
+        m2 = mox.Mox()
+
+        assert id(m1) in mox.Mox._instances
+        assert mox.Mox._instances[id(m1)] == m1
+        assert id(m2) in mox.Mox._instances
+        assert mox.Mox._instances[id(m2)] == m2
+
+    def test_unset_stubs_for_id(self):
+        m1 = mox.Mox()
+        m2 = mox.Mox()
+
+        m1.stubout(TestClass, "valid_call")
+        m2.stubout(TestClass, "other_valid_call")
+
+        assert len(mox.Mox._instances[id(m1)].stubs.cache) == 1
+        assert len(mox.Mox._instances[id(m2)].stubs.cache) == 1
+
+        mox.Mox.unset_stubs_for_id(id(m1))
+
+        assert len(mox.Mox._instances[id(m1)].stubs.cache) == 0
+        assert len(mox.Mox._instances[id(m2)].stubs.cache) == 1
+
+        mox.Mox.unset_stubs_for_id(id(m2))
+
+        assert len(mox.Mox._instances[id(m1)].stubs.cache) == 0
+        assert len(mox.Mox._instances[id(m2)].stubs.cache) == 0
+
+    def test_unset_all_stubs(self):
+        m1 = mox.Mox()
+        m2 = mox.Mox()
+
+        m1.stubout(TestClass, "valid_call")
+        m2.stubout(TestClass, "other_valid_call")
+
+        assert len(mox.Mox._instances[id(m1)].stubs.cache) == 1
+        assert len(mox.Mox._instances[id(m2)].stubs.cache) == 1
+
+        mox.Mox.unset_all_stubs()
+
+        assert len(mox.Mox._instances[id(m1)].stubs.cache) == 0
+        assert len(mox.Mox._instances[id(m2)].stubs.cache) == 0
+
+
 class MoxTest(unittest.TestCase):
     """Verify Mox works correctly."""
 

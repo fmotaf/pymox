@@ -83,13 +83,37 @@ from .exceptions import (
 from .groups import MethodGroup, MultipleTimesGroup, UnorderedGroup
 
 
-class MoxPropertyMeta(type):
+class _MoxManagerMeta(type):
+    _instances = {}
+
     @property
     def create(cls):
         return Create(cls())
 
+    def __new__(cls, name, bases, dct):
+        obj = super(_MoxManagerMeta, cls).__new__(cls, name, bases, dct)
 
-class Mox(object, metaclass=MoxPropertyMeta):
+        expect = property(lambda self: Expect(mox_obj=self))
+        setattr(obj, "expect", expect)
+
+        return obj
+
+    def __call__(cls, *args, **kwargs):
+        instance = super(_MoxManagerMeta, cls).__call__(*args, **kwargs)
+        cls._instances[id(instance)] = instance
+        return instance
+
+    def unset_stubs_for_id(cls, mox_id):
+        mox_instance = cls._instances[mox_id]
+        mox_instance.unset_stubs()
+
+    def unset_all_stubs(cls):
+        for mox_instance in cls._instances.values():
+            mox_instance.stubs.unset_all()
+            mox_instance.stubs.smart_unset_all()
+
+
+class Mox(metaclass=_MoxManagerMeta):
     """Mox: a factory for creating mock objects."""
 
     # A list of types that should be stubbed out with MockObjects (as
