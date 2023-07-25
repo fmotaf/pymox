@@ -216,26 +216,25 @@ class Mox(object, metaclass=MoxPropertyMeta):
 
         In replay mode
 
-        # Example using StubOutWithMock (the old, clunky way):
+        # Example using stubout (the old, clunky way):
 
-        mock1 = mox.CreateMock(my_import.FooClass)
-        mock2 = mox.CreateMock(my_import.FooClass)
-        foo_factory = mox.StubOutWithMock(my_import, 'FooClass',
-                                          use_mock_anything=True)
-        foo_factory(1, 2).AndReturn(mock1)
-        foo_factory(9, 10).AndReturn(mock2)
-        mox.ReplayAll()
+        mock1 = mox.create_mock(my_import.FooClass)
+        mock2 = mox.create_mock(my_import.FooClass)
+        foo_factory = mox.stubout(my_import, 'FooClass', use_mock_anything=True)
+        foo_factory(1, 2).returns(mock1)
+        foo_factory(9, 10).returns(mock2)
+        mox.replay_all()
 
         my_import.FooClass(1, 2)   # Returns mock1 again.
         my_import.FooClass(9, 10)  # Returns mock2 again.
         mox.verify_all()
 
-        # Example using StubOutClassWithMocks:
+        # Example using stubout_class:
 
-        mox.StubOutClassWithMocks(my_import, 'FooClass')
+        mox.stubout_class(my_import, 'FooClass')
         mock1 = my_import.FooClass(1, 2)   # Returns a new mock of FooClass
         mock2 = my_import.FooClass(9, 10)  # Returns another mock instance
-        mox.ReplayAll()
+        mox.replay_all()
 
         my_import.FooClass(1, 2)   # Returns mock1 again.
         my_import.FooClass(9, 10)  # Returns mock2 again.
@@ -964,7 +963,7 @@ class MethodSignatureChecker(object):
             except IndexError:
                 if not self._has_varargs:
                     raise AttributeError(
-                        "%s does not take %d or more positional " "arguments" % (self._method.__name__, i)
+                        "%s does not take %d or more positional arguments" % (self._method.__name__, i)
                     )
             else:
                 self._record_argument_given(arg_name, arg_status)
@@ -1083,16 +1082,16 @@ class MockMethod(object):
         """Raise an AttributeError with a helpful message."""
 
         raise AttributeError(
-            'MockMethod has no attribute "%s". ' "Did you remember to put your mocks in replay mode?" % name
+            'MockMethod has no attribute "%s". Did you remember to put your mocks in replay mode?' % name
         )
 
     def __iter__(self):
         """Raise a TypeError with a helpful message."""
-        raise TypeError("MockMethod cannot be iterated. " "Did you remember to put your mocks in replay mode?")
+        raise TypeError("MockMethod cannot be iterated. Did you remember to put your mocks in replay mode?")
 
     def __next__(self):
         """Raise a TypeError with a helpful message."""
-        raise TypeError("MockMethod cannot be iterated. " "Did you remember to put your mocks in replay mode?")
+        raise TypeError("MockMethod cannot be iterated. Did you remember to put your mocks in replay mode?")
 
     next = __next__
 
