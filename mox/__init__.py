@@ -59,7 +59,7 @@ from .mox import (  # noqa: F401
     reset,
     verify,
 )
-from .testing import MoxMetaTestBase, MoxTestBase  # noqa: F401
+from .testing.unittest_mox import MoxMetaTestBase, MoxTestBase  # noqa: F401
 
 
 create = Mox.create  # noqa: F401
