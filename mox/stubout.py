@@ -96,7 +96,7 @@ class StubOutForTesting:
 
     def smart_unset_all(self):
         """Reverses all the SmartSet() calls, restoring things to their
-        original definition.  Its okay to call SmartUnsetAll() repeatedly, as
+        original definition. It's okay to call smart_unset_all() repeatedly, as
         later calls have no effect if no SmartSet() calls have been made.
 
         """
@@ -112,7 +112,7 @@ class StubOutForTesting:
         of the given parent.  The parent could be a module when the child is a
         function at module scope.  Or the parent could be a class when a class'
         method is being replaced.  The named child is set to new_child, while
-        the prior definition is saved away for later, when UnsetAll() is
+        the prior definition is saved away for later, when unset_all() is
         called.
 
         This method supports the case where child_name is a staticmethod or a
@@ -131,12 +131,12 @@ class StubOutForTesting:
         setattr(parent, child_name, new_child)
 
     def unset_all(self):
-        """Reverses all the Set() calls, restoring things to their original
-        definition.  Its okay to call UnsetAll() repeatedly, as later calls
-        have no effect if no Set() calls have been made.
+        """Reverses all the set() calls, restoring things to their original
+        definition. It's okay to call unset_all() repeatedly, as later calls
+        have no effect if no set() calls have been made.
 
         """
-        # Undo calls to Set() in reverse order, in case Set() was called on the
+        # Undo calls to set() in reverse order, in case set() was called on the
         # same arguments repeatedly (want the original call to be last one
         # undone)
         self.cache.reverse()
