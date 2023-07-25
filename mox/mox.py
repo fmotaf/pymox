@@ -282,10 +282,6 @@ class Mox(metaclass=_MoxManagerMeta):
 
         self.stubs.unset_all()
 
-    @property
-    def expect(self):
-        return Expect(mox_obj=self)
-
     CreateMock = create_mock
     CreateMockAnything = create_mock_anything
     ReplayAll = replay_all
