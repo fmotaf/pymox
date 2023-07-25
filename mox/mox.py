@@ -782,7 +782,11 @@ class MockObject(MockAnything, object):
             method = getattr(self._class_to_mock, "__call__")
         mock_method = self._create_mock_method("__call__", method_to_mock=method)
 
-        return mock_method(*params, **named_params)
+        try:
+            return mock_method(*params, **named_params)
+        except AttributeError as e:
+            Mox.unset_stubs_for_id(self._mox_id)
+            raise e
 
     @property
     def __class__(self):

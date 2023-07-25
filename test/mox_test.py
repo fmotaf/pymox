@@ -1991,6 +1991,27 @@ class MoxTest(unittest.TestCase):
         # Too many arguments
         self.assertRaises(AttributeError, mock_obj, "foo", "bar")
 
+    def test_callable_object_with_bad_signature_unsets_stubs(self):
+        mox2 = mox.Mox()
+        mox2.stubout(TestClass, "valid_call")
+        self.mox.stubout(TestClass, "other_valid_call")
+
+        assert len(self.mox.stubs.cache) == 1
+        assert len(mox2.stubs.cache) == 1
+
+        mock_obj = self.mox.create_mock(CallableClass)
+        # Too many arguments
+        self.assertRaises(AttributeError, mock_obj, "foo", "bar")
+
+        assert len(self.mox.stubs.cache) == 0
+        assert len(mox2.stubs.cache) == 1
+
+        test_obj = TestClass()
+        self.assertRaises(AttributeError, test_obj.valid_call, "bar")
+
+        assert len(self.mox.stubs.cache) == 0
+        assert len(mox2.stubs.cache) == 0
+
     def test_unordered_group(self):
         """Test that using one unordered group works."""
         mock_obj = self.mox.create_mock_anything()
