@@ -183,8 +183,16 @@ class Mox(metaclass=_MoxManagerMeta):
     def verify_all(self):
         """Call verify on all mock objects created."""
 
+        exceptions_thrown = []
         for mock_obj in self._mock_objects:
-            mock_obj._verify()
+            try:
+                mock_obj._verify()
+            except Error as e:
+                exceptions_thrown.append(e)
+
+        if exceptions_thrown:
+            self.unset_stubs()
+            raise exceptions_thrown[0]
 
     def reset_all(self):
         """Call reset on all mock objects.  This does not unset stubs."""
@@ -281,6 +289,7 @@ class Mox(metaclass=_MoxManagerMeta):
         """Restore stubs to their original state."""
 
         self.stubs.unset_all()
+        self.stubs.smart_unset_all()
 
     CreateMock = create_mock
     CreateMockAnything = create_mock_anything
