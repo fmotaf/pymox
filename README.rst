@@ -1,8 +1,31 @@
-Powerful and intuitive mock object framework for Python.
+Python mocking on steroids.
 
-|package-version|
-|python-versions|
-|Documentation Status|
+|package-version| |python-versions| |Documentation Status|
+
+What
+====
+
+Pymox is mocking on steroids. It’s a powerful mock object framework for
+Python, providing many tools to help with your unit tests, so you can
+write them in an easy, quick and intuitive way.
+
+Why
+===
+
+Why ``Pymox``? Python already has batteries included. It has its own
+``mock`` library, widely used in Python applications.
+
+So, why ``pytest``, given we have Python’s ``unittest``? Why ``arrow``
+or ``pendulum`` given we have Python’s ``datetime``? Why ``X``, given we
+have Python’s ``Y``?
+
+You got it 😉!
+
+Coming Soon \* Async support \* Decorator \* Ignore args \* String
+imports
+
+How
+===
 
 Install
 -------
@@ -11,388 +34,293 @@ Install
 
    pip install pymox
 
-Tutorial
---------
+Cool Stuff
+----------
 
-Basics
-~~~~~~
-
-Pymox works in a way you set expectations and then enter in replay mode.
-Here is a basic example:
+New Elegant Way
+~~~~~~~~~~~~~~~
 
 .. code:: python
 
-   class Duck:
-       def quack(self, times=1):
-           return ['quack'] * times
-
-       def walk(self):
-           return ['walking']
-
-       def walk_and_quack(self, times=1):
-           return self.walk() + self.quack(times=times)
-
-Here is a ``Duck`` class. Let's play with our 🦆 and Pymox!
-
-.. code:: python
-
-   import mox
+   # conftest.py
+   pytest_plugins = ("mox.testing.pytest_mox",)
 
 
-   class TestDuck:
+   # test.py
+   from mox import expect, stubout
 
-       def test_quack(self):
-           m = mox.Mox()
-           m_duck = m.CreateMock(Duck)
 
-           # expects quack to be called with `times=1`
-           m_duck.quack(times=1).returns(['new quack'])
+   class TestOs:
+        def test_getcwd(self):
+           with stubout(os, 'getcwd') as m_getcwd, expect:
+               m_getcwd.to_be.called_with().and_return('/mox/path')
 
-           m.replay_all()
-           assert m_duck.quack(times=1) == ['new quack']
-           m.verify_all()
+           assert os.getcwd() == '/mox/path'
+           mox.verify(m_getcwd)
 
-Let's change the test a little bit:
+If you want to be less verbose:
 
 .. code:: python
 
-       # [...]
-       def test_quack_2(self):
-           m = mox.Mox()
-           m_duck = m.CreateMock(Duck)
+   class TestOs:
+        def test_getcwd(self):
+           with stubout(os, 'getcwd') as m_getcwd:
+               m_getcwd().returns('/mox/path')
 
-           # expects quack to be called with `times=1`
-           m_duck.quack(times=1).returns(['new quack'])
+           assert os.getcwd() == '/mox/path'
+           mox.verify(m_getcwd)
 
-           m.replay_all()
-           assert m_duck.walk() == ['walking']
-           assert m_duck.quack(times=1) == ['new quack']
-           m.verify_all()
-
-The test above will fail with the following error:
-
-.. code:: python-traceback
-
-       E           mox.mox.UnexpectedMethodCallError: Unexpected method call.  unexpected:-  expected:+
-       E           - Duck.walk() -> None
-       E           + Duck.quack(times=1) -> ['new quack']
-
-Since you expected quack to be called and walk was called instead. You
-can add an expectation for walk:
+Anything you put inside the context manager is a call expectation, so to
+not expect any call you can:
 
 .. code:: python
 
-       def test_quack_3(self):
-           m = mox.Mox()
-           m_duck = m.CreateMock(Duck)
+   class TestOs:
+        def test_getcwd(self):
+           with stubout(os, 'getcwd') as m_getcwd:
+               pass
 
-           # expects quack to be called with `times=1`
-           m_duck.quack(times=1).returns(['new quack'])
-           m_duck.walk().returns(['pretending to be walking'])
+           # will raise a UnexpectedMethodCallError
+           assert os.getcwd() == '/mox/path'
+           mox.verify(m_getcwd)
 
-           m.replay_all()
-           assert m_duck.quack(times=1) == ['new quack']
-           assert m_duck.walk() == ['pretending to be walking']
-           m.verify_all()
-
-You can also stub out ``quack`` method only and mox won't care about the
-other methods:
+Dict Access
+~~~~~~~~~~~
 
 .. code:: python
 
-       def test_quack_4(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(duck, 'quack')
-           """
-           You can also do with the class:
-           m.stubout(Duck, 'quack')
-           """
-
-           # expects quack to be called with `times=1`
-           duck.quack(times=1).returns(['new quack'])
-
-           m.replay_all()
-           assert duck.quack(times=1) == ['new quack']
-           assert duck.walk() == ['walking']
-           m.verify_all()
-
-The order matters, so if you do:
-
-.. code:: python
-
-       def test_quack_5(self):
-           m = mox.Mox()
-           m_duck = m.CreateMock(Duck)
-
-           # expects quack to be called with `times=1`
-           m_duck.quack(times=1).returns(['new quack'])
-           m_duck.walk().returns(['pretending to be walking'])
-
-           m.replay_all()
-           assert m_duck.walk() == ['pretending to be walking']
-           assert m_duck.quack(times=1) == ['new quack']
-           m.verify_all()
-
-It fails with:
-
-.. code:: python-traceback
-
-       E           mox.mox.UnexpectedMethodCallError: Unexpected method call.  unexpected:-  expected:+
-       E           - Duck.walk() -> None
-       E           + Duck.quack(times=1) -> ['new quack']
-
-To fix that you can use ``any_order()``:
-
-.. code:: python
-
-       def test_quack_6(self):
-           m = mox.Mox()
-           m_duck = m.CreateMock(Duck)
-
-           # expects quack to be called with `times=1`
-           m_duck.quack(times=1).any_order().returns(['new quack'])
-           m_duck.walk().any_order().returns(['pretending to be walking'])
-
-           m.replay_all()
-           assert m_duck.walk() == ['pretending to be walking']
-           assert m_duck.quack(times=1) == ['new quack']
+   class TestDict:
+       def test_dict_access(self):
+           config = {'env': 'dev', 'reload': True} 
+           
+           # doing in another way using create, but you can do with stubout too
+           mock_config = mox.create(config) 
+           
+           mock_config['env'].returns('prod')
+           mock_config['reload'].returns(False)
+           
+           mox.replay(mock_config)
+           assert mock_config['env'] == 'prod'
+           assert mock_config['reload'] is False
+           mox.verify(mock_config)
 
 Comparators
 ~~~~~~~~~~~
 
-You can use comparators when you are unsure of the arguments of a method
-call.
+.. code:: python
+
+   class Client:
+       def get(self, url, params):
+           return requests.get(url, params)
+       
+       
+   class Service:
+       def get_contacts(self):
+           url = 'https://my.reallylong.service/api/v1/contacts/'
+           params = {'added': '7days', 'order_by': '-created'}
+           return Client().get(url, params)
+
+
+   class TestSevice:
+       def test_get_contacts_comparators_str_and_key_value(self):
+           with stubout(Client, 'get') as m_get:
+               url = mox.str_contains('/api/v1/contacts')
+               params = mox.contains_key_value('added', '7days')
+               m_get(url, params).returns({})
+
+           service = Service()
+           assert service.get_contacts() == {}
+           mox.verify(m_get)
+
+       def test_get_contacts_comparators_and_func_in_is_a(self):
+           with stubout(Client, 'get') as m_get:
+               url = mox.func(lambda v: str.startswith('https://my.reallylong.service/'))
+               params = mox.and_(
+                   mox.is_a(dict),
+                   mox.in_('added'),
+               )
+               m_get(url, params).returns({})
+
+           service = Service()
+           assert service.get_contacts() == {}
+           mox.verify(m_get)
+           
+       def test_get_contacts_comparators_ignore_arg_not(self):
+           with stubout(Client, 'get') as m_get:
+               url = mox.ignore_arg
+               params = mox.not_(None)
+               m_get(url, params).returns({})
+
+           service = Service()
+           assert service.get_contacts() == {}
+           mox.verify(m_get)
+
+Other comparators: ``contains_attribute_value``, ``in_``, ``is_``,
+``is_almost``, ``or_``, ``same_elements_as``, ``regex``
+
+And Raises
+~~~~~~~~~~
 
 .. code:: python
 
-       def test_quack_7(self):
+   class TestOs:
+        def test_getcwd(self):
+           with stubout(os, 'getcwd') as m_getcwd:
+               # .and_raise(..) also works
+               os.getcwd().raises(Exception('error'))
+
+           with pytest.raises(Exception, match='error'):
+               os.getcwd()
+           mox.verify(m_getcwd)
+
+Multiple Times
+~~~~~~~~~~~~~~
+
+.. code:: python
+
+   class TestOs:
+        def test_getcwd(self):
+           with stubout(os, 'getcwd') as m_getcwd:
+               m_getcwd().returns('/mox/path')
+               # the second call will return a different value
+               m_getcwd().returns('/mox/another/path')
+               # the three subsequent calls will return "/"
+               # if no argument is passed, multiple_times doesn't limit the number of calls 
+               m_getcwd().multiple_times(3).returns('/')
+
+           assert os.getcwd() == '/mox/path'
+           assert os.getcwd() == '/mox/another/path'
+           mox.verify(m_getcwd)
+
+Any order
+~~~~~~~~~
+
+If you stub out multiple, the order os calls is enforced, unless you use
+``any_order``
+
+.. code:: python
+
+   class TestOs:
+       def test_getcwd(self):
+           with stubout.many([os, 'getcwd'], [os, 'cpu_count']) as (m_getcwd, m_cpu_count):
+               m_getcwd().returns('/mox/path')
+               m_cpu_count().returns('10')
+
+           # will raise a UnexpectedMethodCallError
+           assert os.cpu_count() == '10'
+           assert os.getcwd() == '/mox/path'
+           mox.verify(m_getcwd, m_cpu_count)
+
+       def test_getcwd_anyorder(self):
+           with stubout.many([os, 'getcwd'], [os, 'cpu_count']) as (m_getcwd, m_cpu_count):
+               m_getcwd().any_order().returns('/mox/path')
+               m_cpu_count().any_order().returns('10')
+
+           assert os.cpu_count() == '10'
+           assert os.getcwd() == '/mox/path'
+           mox.verify(m_getcwd, m_cpu_count)
+
+Remember/Value
+~~~~~~~~~~~~~~
+
+The Remember and Value are comparators, but they deserve their own
+section. They can be useful to retrieve some values from deeper levels
+of your codebase, and bring to the test for comparison. Let’s see an
+example:
+
+.. code:: python
+
+   class Handler:
+       def modify(self, d):
+           # any integer key less than 5 is removed from the dict 
+           keys_to_remove = [key for key in d if isinstance(key, int) and key < 5]
+           for key in keys_to_remove:
+               del d[key]
+           return d
+
+       def send(self, d):
+           return d
+
+
+   class Manager:
+       def __init__(self, handlers=None):
+           self.handlers = handlers or []
+
+       def process(self, d):
+           for handler in self.handlers:
+               modified = handler.modify(d)
+               handler.send(modified)
+
+
+   class TestList(mox.MoxTestBase):
+       def test_getcwd(self):
+           mydict = {1: "apple", 4: "banana", 6: {2: 3, 4: {1: "orange", 7: 8}}, 8: 3}
+           myvalue = mox.value()
+
+           with mox.stubout(Handler, 'send') as mock_send:
+               # so we use remember in the send call, and its value then the function is
+               # called will go to `myvalue`
+               mock_send(mox.remember(myvalue))
+
+           Manager([Handler()]).process(mydict)
+           mox.verify(mock_send)
+
+           # now we can compare myvalue with what we think its value must be
+           assert myvalue == {6: {2: 3, 4: {1: 'orange', 7: 8}}, 8: 3}
+
+Classic Way
+~~~~~~~~~~~
+
+.. code:: python
+
+   import mox
+   import os
+
+   class TestOs:
+       def test_getcwd(self):
            m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           def validate_arg(arg):
-            if arg in [1, 2, 3]:
-             return True
-            return False
-
-           duck.quack(times=mox.is_a(int)).returns(['new quack'])
-           duck.quack(times=mox.not_(mox.is_(4))).returns(['new quack'])
-           duck.quack(times=mox.func(validate_arg)).returns(['new quack'])
-           duck.quack(times=mox.or_(mox.Is(1), mox.is_(2), mox.is_(3))).returns(['new quack'])
-
-           duck.quack(times=mox.ignore_arg()).returns(['new quack'])
-           duck.quack(times=mox.is_almost(1.00003, places=4)).returns(['new quack'])
+        
+           m.stubout(os, 'getcwd')
+           # calls
+           os.getcwd().returns('/mox/path')
 
            m.replay_all()
-           assert duck.quack(times=random.choice([1, 2, 3])) == ['new quack']
-           assert duck.quack(times=random.choice([1, 2, 3])) == mox.in_('new quack')
-           assert duck.quack(times=random.choice([1, 2, 3]))[0] == mox.str_contains('quack')
-           assert duck.quack(times=random.choice([1, 2, 3])) == mox.same_elements_as({'new quack'})
-
-           assert duck.quack(times=random.choice([1, 2, 3])) == ['new quack']
-           assert duck.quack(times=1) == ['new quack']
+           assert os.getcwd() == '/mox/path'
            m.verify_all()
 
-All the assertions for the test above should pass. There are other cool
-comparators, like: ``and``, ``contains_attribute_value``,
-``contains_key_value``.
 
-For more comparators, see:
-https://pymox.readthedocs.io/en/latest/reference.html#comparators
+   if __name__ == '__main__':
+       import unittest
+       unittest.main()
 
-Remember
-~~~~~~~~
-
-It's possible to also remember a value that might be changed in your
-code. See the test below:
+Jurassic Way
+~~~~~~~~~~~~
 
 .. code:: python
 
-       def test_quack_8(self):
+   import mox
+   import os
 
-           class StopQuackingDuck:
 
-               def _do_quack(self, choices=None):
-                   return choices
+   class TestOs(mox.MoxTestBase):
+       def test_getcwd(self):
+           self.mox.StubOutWithMock(os, 'getcwd')
+           # calls
+           os.getcwd().AndReturn('/mox/path')
 
-               def quack(self, choices=[], less=False):
-                   if less:
-                       choices.pop()
-                   self._do_quack(choices=choices)
+           self.mox.ReplayAll()
+           self.assertEqual(os.getcwd(), '/mox/path')
+           self.mox.VerifyAll()
 
-           m = mox.Mox()
-           duck = StopQuackingDuck()
 
-           m.stubout(StopQuackingDuck, '_do_quack')
-
-           choices_1 = mox.value()
-           choices_2 = mox.value()
-           duck._do_quack(choices=mox.remember(choices_1))
-           duck._do_quack(choices=mox.remember(choices_2))
-           duck._do_quack(choices=mox.remember(choices_2))
-           duck._do_quack(choices=mox.remember(choices_2))
-
-           all_choices = ['quack', 'new quack', 'newest quack']
-
-           m.replay_all()
-           duck.quack(all_choices, less=False)
-           assert choices_1 == ['quack', 'new quack', 'newest quack']
-
-           duck.quack(all_choices, less=True)
-           assert choices_2 == ['quack', 'new quack']
-
-           duck.quack(all_choices, less=True)
-           assert choices_2 == ['quack']
-
-           duck.quack(all_choices, less=True)
-           assert choices_2 == []
-           m.verify_all()
-
-Other
-~~~~~
-
-You can also make a method return a different value the second time it's
-called:
-
-.. code:: python
-
-       def test_walk_and_quack_0(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           duck.quack(times=1).returns(['new quack'])
-           duck.quack(times=1).returns(['newest quack'])
-
-           m.replay_all()
-           assert duck.walk_and_quack() == ['walking', 'new quack']
-
-But since we didn't use m.verify_all(), it didn't require the second
-call to happen. Let's add the verify and see what happens:
-
-.. code:: python
-
-       def test_walk_and_quack_1(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           duck.quack(times=1).returns(['new quack'])
-           duck.quack(times=1).returns(['newest quack'])
-
-           m.replay_all()
-           assert duck.walk_and_quack() == ['walking', 'new quack']
-           m.verify_all()
-
-It fails with:
-
-.. code:: python-traceback
-
-       E           mox.mox.ExpectedMethodCallsError: Verify: Expected methods never called:
-       E             0.  Duck.quack.__call__(times=1) -> ['newest quack']
-
-Let's fix it by adding a second call:
-
-.. code:: python
-
-       def test_walk_and_quack_2(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           duck.quack(times=1).returns(['new quack'])
-           duck.quack(times=1).returns(['newest quack'])
-
-           m.replay_all()
-           assert duck.walk_and_quack() == ['walking', 'new quack']
-           assert duck.walk_and_quack() == ['walking', 'new quack']
-           m.verify_all()
-
-Now you get the following error, since in the second time it returns
-['newest quack'].
-
-.. code:: python-traceback
-
-       E       AssertionError: assert ['walking', 'newest quack'] == ['walking', 'new quack']
-       E         At index 1 diff: 'newest quack' != 'new quack'
-       E         Full diff:
-       E         - ['walking', 'new quack']
-       E         + ['walking', 'newest quack']
-       E         ?                 +++
-
-Let's fix it:
-
-.. code:: python
-
-       def test_walk_and_quack_3(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           duck.quack(times=1).returns(['new quack'])
-           duck.quack(times=1).returns(['newest quack'])
-
-           m.replay_all()
-           assert duck.walk_and_quack() == ['walking', 'new quack']
-           assert duck.walk_and_quack() == ['walking', 'newest quack']
-           m.verify_all()
-
-Let's now see how we can mock and assert calls in the context of a loop:
-
-.. code:: python
-
-       def test_walk_and_quack_4(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           duck.quack(times=1).returns(['new quack'])
-
-           m.replay_all()
-           assert duck.walk() == ['walking']
-           for _ in range(3):
-               assert duck.walk_and_quack() == ['walking', 'new quack']
-           m.verify_all()
-
-If you run the test above, you get the following:
-
-.. code:: python-traceback
-
-       E           mox.mox.UnexpectedMethodCallError: Unexpected method call Duck.quack.__call__(times=1) -> None
-
-Let's fix by using the ``multiple_times`` group.
-
-.. code:: python
-
-       def test_walk_and_quack_5(self):
-           m = mox.Mox()
-           duck = Duck()
-
-           m.stubout(Duck, 'quack')
-
-           duck.quack(times=1).multiple_times().returns(['new quack'])
-
-           m.replay_all()
-           assert duck.walk() == ['walking']
-           for _ in range(3):
-               assert duck.walk_and_quack() == ['walking', 'new quack']
-           m.verify_all()
-
-If you know exactly how many calls are made, you can add an argument:
-``.multiple_times(3)``.
+   if __name__ == '__main__':
+       import unittest
+       unittest.main()
 
 Next
 ~~~~
 
-That's it for now! For a more comprehensive tutorial, see:
+That’s it for now! For a more comprehensive tutorial, see:
 https://pymox.readthedocs.io/en/latest/tutorial.html
 
 For more examples, see:
@@ -406,14 +334,6 @@ Documentation
 
 For full documentation, including installation, tutorials and PDF
 documents, please see http://pymox.rtfd.io/.
-
-http://pymox.readthedocs.io/en/latest/index.html
-
-Disclaimer
-----------
-
-Pymox is a fork of Mox. Mox is Copyright 2008 Google Inc, and licensed
-under the Apache License, Version 2.0; see the file COPYING for details.
 
 .. |package-version| image:: https://badge.fury.io/py/pymox.svg
 .. |python-versions| image:: https://img.shields.io/pypi/pyversions/pymox.svg
