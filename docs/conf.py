@@ -8,6 +8,7 @@
 # Pip imports
 from pkg_resources import get_distribution
 
+
 # We want an image in the README and include the README in the docs.
 suppress_warnings = ["image.nonlocal_uri"]
 

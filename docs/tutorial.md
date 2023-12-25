@@ -13,9 +13,9 @@ class Duck:
         return ['walking']
 
     def walk_and_quack(self, times=1):
-        return self.walk() + self.quack(times=times) 
+        return self.walk() + self.quack(times=times)
 ```
-Here is a `Duck` class. Let's play with our 🦆 and Pymox! 
+Here is a `Duck` class. Let's play with our 🦆 and Pymox!
 
 ```python
 import mox
@@ -35,7 +35,7 @@ class TestDuck:
         m.verify_all()
 ```
 Let's change the test a little bit:
-    
+
 ```python
     # [...]
     def test_quack_2(self):
@@ -73,9 +73,9 @@ Since you expected quack to be called and walk was called instead. You can add a
         assert m_duck.walk() == ['pretending to be walking']
         m.verify_all()
 ```
-    
+
 You can also stub out `quack` method only and mox won't care about the other methods:
-    
+
 ```python
     def test_quack_4(self):
         m = mox.Mox()
@@ -140,31 +140,31 @@ To fix that you can use `any_order()`:
 You can use comparators when you are unsure of the arguments of a method call.
 
 ```python
-    def test_quack_7(self):  
+    def test_quack_7(self):
         m = mox.Mox()
         duck = Duck()
-        
+
         m.stubout(Duck, 'quack')
-        
+
         def validate_arg(arg):
          if arg in [1, 2, 3]:
           return True
          return False
-        
+
         duck.quack(times=mox.is_a(int)).returns(['new quack'])
         duck.quack(times=mox.not_(mox.is_(4))).returns(['new quack'])
         duck.quack(times=mox.func(validate_arg)).returns(['new quack'])
         duck.quack(times=mox.or_(mox.Is(1), mox.is_(2), mox.is_(3))).returns(['new quack'])
-        
+
         duck.quack(times=mox.ignore_arg()).returns(['new quack'])
         duck.quack(times=mox.is_almost(1.00003, places=4)).returns(['new quack'])
-        
+
         m.replay_all()
         assert duck.quack(times=random.choice([1, 2, 3])) == ['new quack']
         assert duck.quack(times=random.choice([1, 2, 3])) == mox.in_('new quack')
         assert duck.quack(times=random.choice([1, 2, 3]))[0] == mox.str_contains('quack')
         assert duck.quack(times=random.choice([1, 2, 3])) == mox.same_elements_as({'new quack'})
-        
+
         assert duck.quack(times=random.choice([1, 2, 3])) == ['new quack']
         assert duck.quack(times=1) == ['new quack']
         m.verify_all()
@@ -196,7 +196,7 @@ It's possible to also remember a value that might be changed in your code. See t
         duck = StopQuackingDuck()
 
         m.stubout(StopQuackingDuck, '_do_quack')
-        
+
         choices_1 = mox.value()
         choices_2 = mox.value()
         duck._do_quack(choices=mox.remember(choices_1))
@@ -262,7 +262,7 @@ It fails with:
 ```python-traceback
     E           mox.mox.ExpectedMethodCallsError: Verify: Expected methods never called:
     E             0.  Duck.quack.__call__(times=1) -> ['newest quack']
-```    
+```
 
 Let's fix it by adding a second call:
 
@@ -311,7 +311,7 @@ Let's fix it:
         m.verify_all()
 ```
 
-Let's now see how we can mock and assert calls in the context of a loop:   
+Let's now see how we can mock and assert calls in the context of a loop:
 
 ```python
     def test_walk_and_quack_4(self):
@@ -333,7 +333,7 @@ If you run the test above, you get the following:
 
 ```python-traceback
     E           mox.mox.UnexpectedMethodCallError: Unexpected method call Duck.quack.__call__(times=1) -> None
-```    
+```
 
 Let's fix by using the `multiple_times` group.
 
@@ -352,5 +352,5 @@ Let's fix by using the `multiple_times` group.
             assert duck.walk_and_quack() == ['walking', 'new quack']
         m.verify_all()
 ```
-    
+
 If you know exactly how many calls are made, you can add an argument: `.multiple_times(3)`.

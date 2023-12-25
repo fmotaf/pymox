@@ -91,14 +91,14 @@ Dict Access
 
    class TestDict:
        def test_dict_access(self):
-           config = {'env': 'dev', 'reload': True} 
-           
+           config = {'env': 'dev', 'reload': True}
+
            # doing in another way using create, but you can do with stubout too
-           mock_config = mox.create(config) 
-           
+           mock_config = mox.create(config)
+
            mock_config['env'].returns('prod')
            mock_config['reload'].returns(False)
-           
+
            mox.replay(mock_config)
            assert mock_config['env'] == 'prod'
            assert mock_config['reload'] is False
@@ -112,8 +112,8 @@ Comparators
    class Client:
        def get(self, url, params):
            return requests.get(url, params)
-       
-       
+
+
    class Service:
        def get_contacts(self):
            url = 'https://my.reallylong.service/api/v1/contacts/'
@@ -144,7 +144,7 @@ Comparators
            service = Service()
            assert service.get_contacts() == {}
            mox.verify(m_get)
-           
+
        def test_get_contacts_comparators_ignore_arg_not(self):
            with stubout(Client, 'get') as m_get:
                url = mox.ignore_arg
@@ -185,7 +185,7 @@ Multiple Times
                # the second call will return a different value
                m_getcwd().returns('/mox/another/path')
                # the three subsequent calls will return "/"
-               # if no argument is passed, multiple_times doesn't limit the number of calls 
+               # if no argument is passed, multiple_times doesn't limit the number of calls
                m_getcwd().multiple_times(3).returns('/')
 
            assert os.getcwd() == '/mox/path'
@@ -232,7 +232,7 @@ example:
 
    class Handler:
        def modify(self, d):
-           # any integer key less than 5 is removed from the dict 
+           # any integer key less than 5 is removed from the dict
            keys_to_remove = [key for key in d if isinstance(key, int) and key < 5]
            for key in keys_to_remove:
                del d[key]
@@ -279,7 +279,7 @@ Classic Way
    class TestOs:
        def test_getcwd(self):
            m = mox.Mox()
-        
+
            m.stubout(os, 'getcwd')
            # calls
            os.getcwd().returns('/mox/path')
