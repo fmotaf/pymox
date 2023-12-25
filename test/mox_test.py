@@ -1796,8 +1796,8 @@ class MockObjectContextManagerTest(unittest.TestCase):
 class TestMoxMeta:
     def test_context_managers(self):
         m = mox.Mox()
-        assert type(mox.Mox.create) == mox.contextmanagers.Create
-        assert type(m.expect) == mox.contextmanagers.Expect
+        assert type(mox.Mox.create) is mox.contextmanagers.Create
+        assert type(m.expect) is mox.contextmanagers.Expect
 
     def test_instances(self):
         m1 = mox.Mox()
