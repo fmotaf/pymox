@@ -1,6 +1,5 @@
 class Create:
     def __init__(self):
-        # Internal imports
         from .mox import Mox
 
         self.m = Mox()
