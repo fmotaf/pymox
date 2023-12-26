@@ -234,6 +234,7 @@ class Mox(metaclass=_MoxManagerMeta):
             stub.__name__ = attr_name
 
         self.stubs.set(obj, attr_name, stub)
+        return stub
 
     def stubout_class(self, obj, attr_name):
         """Replace a class with a "mock factory" that will create mock objects.
@@ -284,6 +285,7 @@ class Mox(metaclass=_MoxManagerMeta):
         factory = _MockObjectFactory(attr_to_replace, self)
         self._mock_objects.append(factory)
         self.stubs.set(obj, attr_name, factory)
+        return factory
 
     def unset_stubs(self):
         """Restore stubs to their original state."""

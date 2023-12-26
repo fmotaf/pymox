@@ -2526,7 +2526,7 @@ class MoxTest(unittest.TestCase):
     def test_stubout__method__explicit_contains__for__set(self):
         """Test that explicit __contains__() for a set gets mocked with
         success."""
-        self.mox.stubout(TestClass, "SOME_CLASS_SET")
+        stub = self.mox.stubout(TestClass, "SOME_CLASS_SET")
         TestClass.SOME_CLASS_SET.__contains__("x").returns(True)
 
         dummy = TestClass()
@@ -2538,9 +2538,10 @@ class MoxTest(unittest.TestCase):
         self.mox.verify_all()
 
         self.assertTrue(result)
+        assert TestClass.SOME_CLASS_SET == stub
 
     def test_stub_out__signature_matching_init_(self):
-        self.mox.stubout(mox_test_helper.ExampleClass, "__init__")
+        stub = self.mox.stubout(mox_test_helper.ExampleClass, "__init__")
         mox_test_helper.ExampleClass.__init__(mox.IgnoreArg())
         self.mox.replay_all()
 
@@ -2548,12 +2549,13 @@ class MoxTest(unittest.TestCase):
         # __init__
         mox_test_helper.ChildExampleClass()
 
+        assert mox_test_helper.ExampleClass.__init__ == stub
         self.mox.verify_all()
         self.mox.unset_stubs()
 
     def test_stub_out_class__old_style(self):
         """Test a mocked class whose __init__ returns a Mock."""
-        self.mox.stubout(mox_test_helper, "TestClassFromAnotherModule")
+        stub = self.mox.stubout(mox_test_helper, "TestClassFromAnotherModule")
         self.assertIsInstance(mox_test_helper.TestClassFromAnotherModule, mox.MockObject)
 
         mock_instance = self.mox.create_mock(mox_test_helper.TestClassFromAnotherModule)
@@ -2565,12 +2567,13 @@ class MoxTest(unittest.TestCase):
         a_mock = mox_test_helper.TestClassFromAnotherModule()
         actual = a_mock.value()
 
+        assert mox_test_helper.TestClassFromAnotherModule == stub
         self.mox.verify_all()
         self.mox.unset_stubs()
         self.assertEqual("mock instance", actual)
 
     def test_stub_out_class(self):
-        self.mox.stubout_class(mox_test_helper, "CallableClass")
+        factory = self.mox.stubout_class(mox_test_helper, "CallableClass")
 
         # Instance one
         mock_one = mox_test_helper.CallableClass(1, 2)
@@ -2589,6 +2592,7 @@ class MoxTest(unittest.TestCase):
         actual_two = two("one")
 
         self.mox.verify_all()
+        assert mox_test_helper.CallableClass == factory
         self.mox.unset_stubs()
 
         # Verify the correct mocks were returned
@@ -2600,7 +2604,7 @@ class MoxTest(unittest.TestCase):
         self.assertEqual("called mock", actual_two)
 
     def test_stub_out_class_with_meta_class(self):
-        self.mox.stubout_class(mox_test_helper, "ChildClassWithMetaClass")
+        factory = self.mox.stubout_class(mox_test_helper, "ChildClassWithMetaClass")
 
         mock_one = mox_test_helper.ChildClassWithMetaClass(kw=1)
         mock_one.value().returns("mock")
@@ -2611,6 +2615,7 @@ class MoxTest(unittest.TestCase):
         actual_one = one.value()
 
         self.mox.verify_all()
+        assert mox_test_helper.ChildClassWithMetaClass == factory
         self.mox.unset_stubs()
 
         # Verify the correct mocks were returned
@@ -2673,24 +2678,26 @@ class MoxTest(unittest.TestCase):
         assert len(self.mox.stubs.cache) == 0
 
     def test_stub_out_class_wrong_signature(self):
-        self.mox.stubout_class(mox_test_helper, "CallableClass")
+        factory = self.mox.stubout_class(mox_test_helper, "CallableClass")
 
         self.assertRaises(AttributeError, mox_test_helper.CallableClass)
 
+        assert mox_test_helper.CallableClass == factory
         self.mox.unset_stubs()
 
     def test_stub_out_class_wrong_parameters(self):
-        self.mox.stubout_class(mox_test_helper, "CallableClass")
+        factory = self.mox.stubout_class(mox_test_helper, "CallableClass")
 
         mox_test_helper.CallableClass(1, 2)
 
         self.mox.replay_all()
 
         self.assertRaises(mox.UnexpectedMethodCallError, mox_test_helper.CallableClass, 8, 9)
+        assert mox_test_helper.CallableClass == factory
         self.mox.unset_stubs()
 
     def test_stub_out_class_too_many_created(self):
-        self.mox.stubout_class(mox_test_helper, "CallableClass")
+        factory = self.mox.stubout_class(mox_test_helper, "CallableClass")
 
         mox_test_helper.CallableClass(1, 2)
 
@@ -2698,15 +2705,18 @@ class MoxTest(unittest.TestCase):
         mox_test_helper.CallableClass(1, 2)
         self.assertRaises(mox.UnexpectedMockCreationError, mox_test_helper.CallableClass, 8, 9)
 
+        assert mox_test_helper.CallableClass == factory
         self.mox.unset_stubs()
 
     def test_warns_user_if_mocking_mock(self):
         """Test that user is warned if they try to stub out a MockAnything."""
-        self.mox.stubout(TestClass, "my_static_method")
+        stub = self.mox.stubout(TestClass, "my_static_method")
         self.assertRaises(TypeError, self.mox.stubout, TestClass, "my_static_method")
+        assert TestClass.my_static_method == stub
 
     def test_stub_out_first_class_method_verifies_signature(self):
-        self.mox.stubout(mox_test_helper, "MyTestFunction")
+        stub = self.mox.stubout(mox_test_helper, "MyTestFunction")
+        assert mox_test_helper.MyTestFunction == stub
 
         # Wrong number of arguments
         self.assertRaises(AttributeError, mox_test_helper.MyTestFunction, 1)
@@ -2752,7 +2762,7 @@ class MoxTest(unittest.TestCase):
                 self.obj = TestClass()
 
         foo = foo()
-        self.mox.stubout(foo, "obj")
+        stub = self.mox.stubout(foo, "obj")
         self.assertIsInstance(foo.obj, mox.MockObject)
         foo.obj.valid_call()
         self.mox.replay_all()
@@ -2760,17 +2770,20 @@ class MoxTest(unittest.TestCase):
         foo.obj.valid_call()
 
         self.mox.verify_all()
+        assert foo.obj == stub
         self.mox.unset_stubs()
         self.assertNotIsInstance(foo.obj, mox.MockObject)
 
     def test_stub_out_re_works(self):
-        self.mox.stubout(re, "search")
+        stub = self.mox.stubout(re, "search")
 
         re.search("a", "ivan").returns("true")
 
         self.mox.replay_all()
         result = TestClass().re_search()
         self.mox.verify_all()
+
+        assert re.search == stub
         self.mox.unset_stubs()
 
         self.assertEqual(result, "true")
@@ -2812,7 +2825,7 @@ class MoxTest(unittest.TestCase):
     def test_swallowed_unexpected_mock_creation(self):
         """Test that a swallowed UnexpectedMockCreationError will be
         re-raised."""
-        self.mox.stubout_class(mox_test_helper, "CallableClass")
+        factory = self.mox.stubout_class(mox_test_helper, "CallableClass")
         self.mox.replay_all()
 
         def call():
@@ -2824,6 +2837,7 @@ class MoxTest(unittest.TestCase):
         # UnexpectedMockCreationError swallowed
         call()
 
+        assert mox_test_helper.CallableClass == factory
         assert len(self.mox.stubs.cache) == 1
         self.assertRaises(mox.SwallowedExceptionError, self.mox.verify_all)
         assert len(self.mox.stubs.cache) == 0
