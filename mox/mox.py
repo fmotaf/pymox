@@ -489,6 +489,13 @@ class MockAnything:
         # Make sure we are in setup mode, not replay mode
         self._replay_mode = False
 
+    @property
+    def to_be(self):
+        return self
+
+    def called_with(self, *args, **kwargs):
+        return self(*args, **kwargs)
+
     _Replay = _replay
     _Verify = _verify
     _Reset = _reset
@@ -1290,6 +1297,10 @@ class MockMethod(object):
         self._return_value = return_value
         return return_value
 
+    def and_return(self, return_value):
+        """Semantic sugar for returns."""
+        return self.returns(return_value)
+
     def raises(self, exception):
         """Set the exception to raise when this method is called.
 
@@ -1299,6 +1310,10 @@ class MockMethod(object):
         """
 
         self._exception = exception
+
+    def and_raise(self, exception):
+        """Semantic sugar for raises."""
+        return self.raises(exception)
 
     def with_side_effects(self, side_effects):
         """Set the side effects that are simulated when this method is called.

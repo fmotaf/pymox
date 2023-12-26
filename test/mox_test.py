@@ -500,11 +500,26 @@ class MockMethodTest(unittest.TestCase):
         return_value = self.mock_method(["original"])
         self.assertEqual(return_value, expected_return_value)
 
+    def test_returns_value_with_and_return(self):
+        """Should return a specified return value."""
+        expected_return_value = "test"
+        self.expected_method.and_return(expected_return_value)
+        return_value = self.mock_method(["original"])
+        assert return_value == expected_return_value
+
     def test_raises_exception(self):
         """Should raise a specified exception."""
         expected_exception = Exception("test exception")
         self.expected_method.raises(expected_exception)
         self.assertRaises(Exception, self.mock_method)
+
+    def test_raises_exception_with_and_raise(self):
+        """Should raise a specified exception with `and_raise`."""
+        expected_exception = Exception("test exception")
+        self.expected_method.and_raise(expected_exception)
+
+        with pytest.raises(Exception, match="test exception"):
+            self.mock_method(['original'])
 
     def test_with_side_effects(self):
         """Should call state modifier."""
@@ -770,9 +785,23 @@ class MockAnythingTest(unittest.TestCase):
 
         self.mock_object._verify()
 
+    def test_is_callable_with_called_with(self):
+        """Test is_callable, this time using .called_with()
+        """
+        self.mock_object.called_with().returns("mox0rd")
+        self.mock_object._replay()
+
+        self.assertEqual("mox0rd", self.mock_object())
+
+        self.mock_object._verify()
+
     def test_is_reprable(self):
         """Test that MockAnythings can be repr'd without causing a failure."""
         self.assertIn("MockAnything", repr(self.mock_object))
+
+    def test_to_be(self):
+        """Test that to_be returns the same instance"""
+        assert self.mock_object.to_be == self.mock_object
 
 
 class MethodCheckerTest(unittest.TestCase):
