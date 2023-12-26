@@ -1435,85 +1435,67 @@ class MockObjectContextManagerTest(unittest.TestCase):
     def test_description_mocked_object(self):
         obj = FarAwayClass()
 
-        with mox.create as m:
-            m.stubout(obj, "distant_method")
-
-        with m.expect:
+        with mox.stubout(obj, "distant_method") as stub, mox.expect:
             obj.distant_method().returns(True)
 
         self.assertEqual(obj.distant_method._description, "FarAwayClass.distant_method")
-        m.unset_stubs()
-        m.reset_all()
+
+        mox.reset(stub)
 
     def test_description_module_function(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper, "MyTestFunction")
-
-        with m.expect:
+        with mox.stubout(mox_test_helper, "MyTestFunction") as stub, mox.expect:
             mox_test_helper.MyTestFunction(one=1, two=2).returns(True)
 
         self.assertEqual(
             mox_test_helper.MyTestFunction._description,
             "function test.mox_test_helper.MyTestFunction",
         )
-        m.unset_stubs()
-        m.reset_all()
+
+        mox.reset(stub)
 
     def test_description_mocked_class(self):
         obj = FarAwayClass()
 
-        with mox.create as m:
-            m.stubout(FarAwayClass, "distant_method")
-
-        with m.expect:
+        with mox.stubout(FarAwayClass, "distant_method") as stub, mox.expect:
             obj.distant_method().returns(True)
 
         self.assertEqual(obj.distant_method._description, "FarAwayClass.distant_method")
-        m.unset_stubs()
-        m.reset_all()
+
+        mox.reset(stub)
 
     def test_description_class_method(self):
         obj = mox_test_helper.SpecialClass()
 
-        with mox.create as m:
-            m.stubout(mox_test_helper.SpecialClass, "class_method")
-
-        with m.expect:
+        with mox.stubout(mox_test_helper.SpecialClass, "class_method") as stub, mox.expect:
             mox_test_helper.SpecialClass.class_method().returns(True)
 
         self.assertEqual(obj.class_method._description, "SpecialClass.class_method")
-        m.unset_stubs()
-        m.reset_all()
+
+        mox.reset(stub)
 
     def test_description_static_method_mock_class(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper.SpecialClass, "static_method")
-
-        with m.expect:
+        with mox.stubout(mox_test_helper.SpecialClass, "static_method") as stub, mox.expect:
             mox_test_helper.SpecialClass.static_method().returns(True)
 
         self.assertIn(
             mox_test_helper.SpecialClass.static_method._description,
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
-        m.unset_stubs()
-        m.reset_all()
+
+        mox.reset(stub)
 
     def test_description_static_method_mock_instance(self):
         obj = mox_test_helper.SpecialClass()
 
-        with mox.create as m:
-            m.stubout(obj, "static_method")
-
-        with m.expect:
+        with mox.stubout(obj, "static_method") as stub, mox.expect:
             obj.static_method().returns(True)
 
         self.assertIn(
             obj.static_method._description,
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
-        m.unset_stubs()
-        m.reset_all()
+
+        mox.reset(stub)
 
     def test_replay_with_invalid_call(self):
         """UnknownMethodCallError should be raised if a non-member method is
@@ -1836,9 +1818,8 @@ class MockObjectContextManagerTest(unittest.TestCase):
 
 class TestMoxMeta:
     def test_context_managers(self):
-        m = mox.Mox()
-        assert type(mox.Mox.create) is mox.contextmanagers.Create
-        assert type(m.expect) is mox.contextmanagers.Expect
+        assert type(mox.create) is mox.contextmanagers.Create
+        assert type(mox.expect) is mox.contextmanagers.Expect
 
     def test_instances(self):
         m1 = mox.Mox()
@@ -2964,58 +2945,50 @@ class MoxContextManagerTest:
         """Mox should create a mock object for a class from a module imported
         using a simple 'import module' statement"""
 
-        with mox.create as m:
-            example_obj = m.create_mock(mox_test_helper.ExampleClass)
-            m.stubout(mox_test_helper.ExampleClass, "class_method")
-
-        with m.expect:
+        with mox.stubout(mox_test_helper.ExampleClass, "class_method") as stub:
+            example_obj = mox.create(mox_test_helper.ExampleClass)
             mox_test_helper.ExampleClass.class_method().returns(example_obj)
 
         def call_helper_class_method():
             return mox_test_helper.ExampleClass.class_method()
 
         expected_obj = call_helper_class_method()
-        m.verify_all()
+        mox.verify(stub, example_obj)
 
         assert expected_obj == example_obj
 
     def test_verify_object_with_complete_replay(self):
         """Mox should replay and verify all objects it created."""
 
-        with mox.create as m:
-            mock_obj = m.create_mock(TestClass)
-
-        with m.expect:
+        mock_obj = mox.create(TestClass)
+        with mox.expect:
             mock_obj.valid_call()
             mock_obj.valid_call_with_args(mox.is_a(TestClass))
 
         mock_obj.valid_call()
         mock_obj.valid_call_with_args(TestClass("some_value"))
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_verify_object_with_incomplete_replay(self):
         """Mox should raise an exception if a mock didn't replay completely."""
-        with mox.create as m:
-            mock_obj = m.create_mock(TestClass)
 
-        with m.expect:
+        mock_obj = mox.create(TestClass)
+        with mox.expect:
             mock_obj.valid_call()
 
         # valid_call() is never made
         with pytest.raises(mox.ExpectedMethodCallsError):
-            m.verify_all()
+            mox.verify(mock_obj)
 
     def test_entire_workflow(self):
         """Test the whole work flow."""
-        with mox.create as m:
-            mock_obj = m.create_mock(TestClass)
-
-        with m.expect:
+        mock_obj = mox.create(TestClass)
+        with mox.expect:
             mock_obj.valid_call().returns("yes")
 
         ret_val = mock_obj.valid_call()
         assert ret_val == "yes"
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_signature_matching_with_comparator_as_first_arg(self):
         """Test that the first argument can be a comparator."""
@@ -3028,57 +3001,49 @@ class MoxContextManagerTest:
             """
             return len(val) != 1
 
-        with mox.create as m:
-            mock_obj = m.create_mock(TestClass)
+        mock_obj = mox.create(TestClass)
 
         # This intentionally does not name the 'nine' param, so it triggers
         # deeper inspection.
-        with m.expect:
+        with mox.expect:
             mock_obj.method_with_args(mox.Func(verify_len), mox.IgnoreArg(), None)
 
         mock_obj.method_with_args([1, 2], "foo", None)
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_callable_object(self):
         """Test recording calls to a callable object works."""
-        with mox.create as m:
-            mock_obj = m.create_mock(CallableClass)
-
-        with m.expect:
+        mock_obj = mox.create(CallableClass)
+        with mox.expect:
             mock_obj("foo").returns("qux")
 
         ret_val = mock_obj("foo")
         assert "qux" == ret_val
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_inherited_callable_object(self):
         """Test recording calls to an object inheriting from a callable
         object."""
-        with mox.create as m:
-            mock_obj = m.create_mock(InheritsFromCallable)
-
-        with m.expect:
+        mock_obj = mox.create(InheritsFromCallable)
+        with mox.expect:
             mock_obj("foo").returns("qux")
 
         ret_val = mock_obj("foo")
         assert "qux" == ret_val
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_callable_object_with_bad_call(self):
         """Test verifying calls to a callable object works."""
-        with mox.create as m:
-            mock_obj = m.create_mock(CallableClass)
-
-        with m.expect:
+        mock_obj = mox.create(CallableClass)
+        with mox.expect:
             mock_obj("foo").returns("qux")
 
         with pytest.raises(mox.UnexpectedMethodCallError):
             mock_obj("ZOOBAZ")
 
     def test_callable_object_verifies_signature(self):
-        with mox.create as m:
-            mock_obj = m.create_mock(CallableClass)
+        mock_obj = mox.create(CallableClass)
 
         # Too many arguments
         with pytest.raises(AttributeError):
@@ -3086,24 +3051,20 @@ class MoxContextManagerTest:
 
     def test_unordered_group(self):
         """Test that using one unordered group works."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.method(1).any_order()
             mock_obj.method(2).any_order()
 
         mock_obj.method(2)
         mock_obj.method(1)
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_unordered_groups_inline(self):
         """Unordered groups should work in the context of ordered calls."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(1).any_order()
             mock_obj.method(2).any_order()
@@ -3114,14 +3075,12 @@ class MoxContextManagerTest:
         mock_obj.method(1)
         mock_obj.close()
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_multiple_unorderd_groups(self):
         """Multiple unoreded groups should work."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.method(1).any_order()
             mock_obj.method(2).any_order()
             mock_obj.foo().any_order("group2")
@@ -3132,14 +3091,12 @@ class MoxContextManagerTest:
         mock_obj.bar()
         mock_obj.foo()
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_multiple_unorderd_groups_out_of_order(self):
         """Multiple unordered groups should maintain external order"""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.method(1).any_order()
             mock_obj.method(2).any_order()
             mock_obj.foo().any_order("group2")
@@ -3151,10 +3108,8 @@ class MoxContextManagerTest:
 
     def test_unordered_group_with_return_value(self):
         """Unordered groups should work with return values."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(1).any_order().returns(9)
             mock_obj.method(2).any_order().returns(10)
@@ -3168,7 +3123,7 @@ class MoxContextManagerTest:
         assert actual_one == 9
         assert actual_two == 10
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_unordered_group_with_comparator(self):
         """Unordered groups should work with comparators"""
@@ -3181,24 +3136,20 @@ class MoxContextManagerTest:
         def verify_two(cmd):
             return True
 
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.foo(["test"], mox.Func(verify_one), bar=1).any_order().returns("yes test")
             mock_obj.foo(["test"], mox.Func(verify_two), bar=1).any_order().returns("anything")
 
         mock_obj.foo(["test"], "anything", bar=1)
         mock_obj.foo(["test"], "test", bar=1)
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_multiple_times(self):
         """Test if MultipleTimesGroup works."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.method(1).multiple_times().returns(9)
             mock_obj.method(2).returns(10)
             mock_obj.method(3).multiple_times().returns(42)
@@ -3210,7 +3161,7 @@ class MoxContextManagerTest:
         mock_obj.method(3)
         mock_obj.method(3)
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
         assert actual_one == 9
 
@@ -3221,10 +3172,8 @@ class MoxContextManagerTest:
 
     def test_multiple_times_using_is_a_parameter(self):
         """Test if MultipleTimesGroup works with a is_a parameter."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(mox.is_a(str)).multiple_times("is_a").returns(9)
             mock_obj.close()
@@ -3234,7 +3183,7 @@ class MoxContextManagerTest:
         second_one = mock_obj.method("2")  # This tests multiple_times.
         mock_obj.close()
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
         assert actual_one == 9
 
@@ -3255,10 +3204,8 @@ class MoxContextManagerTest:
                 self.counter += 1
             return True
 
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(mox.func(my_func)).multiple_times()
             mock_obj.close()
@@ -3269,16 +3216,14 @@ class MoxContextManagerTest:
         mock_obj.method("not-foo")
         mock_obj.close()
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
         assert self.counter == 2
 
     def test_multiple_times_three_methods(self):
         """Test if MultipleTimesGroup works with three or more methods."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(1).multiple_times().returns(9)
             mock_obj.method(2).multiple_times().returns(8)
@@ -3300,14 +3245,12 @@ class MoxContextManagerTest:
         assert actual_three == 7
         assert actual_four == 10
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_multiple_times_missing_one(self):
         """Test if MultipleTimesGroup fails if one method is missing."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(1).multiple_times().returns(9)
             mock_obj.method(2).multiple_times().returns(8)
@@ -3329,10 +3272,8 @@ class MoxContextManagerTest:
         """Test if MultipleTimesGroup works with a group after a
         MultipleTimesGroup.
         """
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(1).multiple_times().returns(9)
             mock_obj.method(3).multiple_times("nr2").returns(42)
@@ -3348,16 +3289,14 @@ class MoxContextManagerTest:
         assert actual_one == 9
         assert actual_three == 42
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_multiple_times_two_groups_failure(self):
         """Test if MultipleTimesGroup fails with a group after a
         MultipleTimesGroup.
         """
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.open()
             mock_obj.method(1).multiple_times().returns(9)
             mock_obj.method(3).multiple_times("nr2").returns(42)
@@ -3377,10 +3316,8 @@ class MoxContextManagerTest:
         def modifier(mutable_list):
             mutable_list[0] = "mutated"
 
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             mock_obj.configure_in_out_parameter(["original"]).with_side_effects(modifier)
             mock_obj.work_with_parameter(["mutated"])
 
@@ -3388,7 +3325,7 @@ class MoxContextManagerTest:
         mock_obj.configure_in_out_parameter(local_list)
         mock_obj.work_with_parameter(local_list)
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_with_side_effects_exception(self):
         """Test side effect operations actually modify their target objects."""
@@ -3396,10 +3333,8 @@ class MoxContextManagerTest:
         def modifier(mutable_list):
             mutable_list[0] = "mutated"
 
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mox.expect:
             method = mock_obj.configure_in_out_parameter(["original"])
             method.with_side_effects(modifier).raises(Exception("exception"))
             mock_obj.work_with_parameter(["mutated"])
@@ -3409,49 +3344,47 @@ class MoxContextManagerTest:
             mock_obj.configure_in_out_parameter(local_list)
         mock_obj.work_with_parameter(local_list)
 
-        m.verify_all()
+        mox.verify(mock_obj)
 
     def test_stub_out_method(self):
         """Test that a method is replaced with a MockObject."""
         test_obj = TestClass()
         method_type = type(test_obj.other_valid_call)
         # Replace other_valid_call with a mock.
-        with mox.create as m:
-            m.stubout(test_obj, "other_valid_call")
+        with mox.stubout(test_obj, "other_valid_call") as stub:
+            ...
 
         assert isinstance(test_obj.other_valid_call, mox.MockObject)
         assert type(test_obj.other_valid_call) is not method_type
 
-        with m.expect:
+        with stub._expect:
             test_obj.other_valid_call().returns("foo")
-        # self.mox.replay_all()
 
         actual = test_obj.other_valid_call()
 
-        m.verify_all()
-        m.unset_stubs()
+        mox.verify(stub)
+
+        mox.Mox.unset_stubs_for_id(stub._mox_id)
         assert "foo" == actual
         assert type(test_obj.other_valid_call) is method_type
 
     def test_stub_out_method__unbound__comparator(self):
         instance = TestClass()
-        with mox.create as m:
-            m.stubout(TestClass, "other_valid_call")
-
-        with m.expect:
+        with mox.stubout(TestClass, "other_valid_call") as stub, mox.expect:
             TestClass.other_valid_call(mox.IgnoreArg()).returns("foo")
 
         actual = TestClass.other_valid_call(instance)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
         assert "foo" == actual
 
     def test_stub_out_method__unbound__subclass__comparator(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper.TestClassFromAnotherModule, "value")
+        with mox.stubout(mox_test_helper.TestClassFromAnotherModule, "value") as stub:
+            ...
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.TestClassFromAnotherModule.value(
                 mox.is_a(mox_test_helper.ChildClassFromAnotherModule)
             ).returns("foo")
@@ -3459,49 +3392,47 @@ class MoxContextManagerTest:
         instance = mox_test_helper.ChildClassFromAnotherModule()
         actual = mox_test_helper.TestClassFromAnotherModule.value(instance)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
         assert "foo" == actual
 
     def test_stub_ou_method__unbound__with_optional_params(self):
-        with mox.create as m:
-            m.stubout(TestClass, "optional_args")
+        with mox.stubout(mox_test_helper.TestClassFromAnotherModule, "value") as stub:
+            ...
 
-        with m.expect:
+        with stub._expect:
             TestClass.optional_args(mox.IgnoreArg(), foo=2)
 
         t = TestClass()
         TestClass.optional_args(t, foo=2)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__unbound__actual_instance(self):
         instance = TestClass()
-        with mox.create as m:
-            m.stubout(TestClass, "other_valid_call")
-
-        with m.expect:
+        with mox.stubout(TestClass, "other_valid_call") as stub, mox.expect:
             TestClass.other_valid_call(instance).returns("foo")
 
         actual = TestClass.other_valid_call(instance)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
         assert "foo" == actual
 
     def test_stub_out_method__unbound__different_instance(self):
         instance = TestClass()
-        with mox.create as m:
-            m.stubout(TestClass, "other_valid_call")
-
-        with m.expect:
+        with mox.stubout(TestClass, "other_valid_call") as stub, mox.expect:
             TestClass.other_valid_call(instance).returns("foo")
 
         # This should fail, since the instances are different
         with pytest.raises(mox.UnexpectedMethodCallError):
             TestClass.other_valid_call("wrong self")
 
+        m = mox.Mox._instances[stub._mox_id]
         assert len(m.stubs.cache) == 1
         with pytest.raises(mox.SwallowedExceptionError):
             m.verify_all()
@@ -3509,100 +3440,105 @@ class MoxContextManagerTest:
 
     def test_stub_out_method__unbound__named_using_positional(self):
         """Check positional parameters can be matched to keyword arguments."""
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "named_params")
-        instance = mox_test_helper.ExampleClass()
+        with mox.stubout(mox_test_helper.ExampleClass, "named_params") as stub:
+            ...
 
-        with m.expect:
+        instance = mox_test_helper.ExampleClass()
+        with stub._expect:
             mox_test_helper.ExampleClass.named_params(instance, "foo", baz=None)
 
         mox_test_helper.ExampleClass.named_params(instance, "foo", baz=None)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__unbound__named_using_positional__some_positional(self):
         """Check positional parameters can be matched to keyword arguments."""
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "test_method")
+        with mox.stubout(mox_test_helper.ExampleClass, "test_method") as stub:
+            ...
+
         instance = mox_test_helper.ExampleClass()
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.ExampleClass.test_method(instance, "one", "two", "nine")
 
         mox_test_helper.ExampleClass.test_method(instance, "one", "two", "nine")
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__unbound__special_args(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "special_args")
+        with mox.stubout(mox_test_helper.ExampleClass, "special_args") as stub:
+            ...
+
         instance = mox_test_helper.ExampleClass()
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.ExampleClass.special_args(instance, "foo", None, bar="bar")
 
         mox_test_helper.ExampleClass.special_args(instance, "foo", None, bar="bar")
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__bound__simple_test(self):
-        with mox.create as m:
-            t = m.create_mock(TestClass)
-
-        with m.expect:
+        t = mox.create(TestClass)
+        with t._expect:
             t.method_with_args(mox.IgnoreArg(), mox.IgnoreArg()).returns("foo")
 
         actual = t.method_with_args(None, None)
 
-        m.verify_all()
+        mox.verify(t)
+        m = mox.Mox._instances[t._mox_id]
         m.unset_stubs()
         assert "foo" == actual
 
     def test_stub_out_method__bound__named_using_positional(self):
         """Check positional parameters can be matched to keyword arguments."""
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "named_params")
+        with mox.stubout(mox_test_helper.ExampleClass, "named_params") as stub:
+            ...
 
         instance = mox_test_helper.ExampleClass()
-
-        with m.expect:
+        with stub._expect:
             instance.named_params("foo", baz=None)
 
         instance.named_params("foo", baz=None)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__bound__named_using_positional__some_positional(self):
         """Check positional parameters can be matched to keyword arguments."""
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "test_method")
+        with mox.stubout(mox_test_helper.ExampleClass, "test_method") as stub:
+            ...
 
         instance = mox_test_helper.ExampleClass()
-
-        with m.expect:
+        with stub._expect:
             instance.test_method(instance, "one", "two", "nine")
 
         instance.test_method(instance, "one", "two", "nine")
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__bound__special_args(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "special_args")
+        with mox.stubout(mox_test_helper.ExampleClass, "special_args") as stub:
+            ...
 
         instance = mox_test_helper.ExampleClass()
 
-        with m.expect:
+        with stub._expect:
             instance.special_args(instance, "foo", None, bar="bar")
 
         instance.special_args(instance, "foo", None, bar="bar")
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_method__func__propgates_exceptions(self):
@@ -3619,10 +3555,7 @@ class MoxContextManagerTest:
                 raise TestException
 
         test_obj = TestClass()
-        with mox.create as m:
-            m.stubout(test_obj, "method_with_args")
-
-        with m.expect:
+        with mox.stubout(test_obj, "method_with_args") as stub, mox.expect:
             test_obj.method_with_args(mox.IgnoreArg(), mox.Func(raise_exception_on_not_one)).returns(1)
             test_obj.method_with_args(mox.IgnoreArg(), mox.Func(raise_exception_on_not_one)).returns(1)
 
@@ -3630,69 +3563,67 @@ class MoxContextManagerTest:
         with pytest.raises(TestException):
             test_obj.method_with_args("ignored", 2)
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stubout__method__explicit_contains__for__set(self):
         """Test that explicit __contains__() for a set gets mocked with
         success."""
-        with mox.create as m:
-            m.stubout(TestClass, "SOME_CLASS_SET")
-
-        with m.expect:
+        with mox.stubout(TestClass, "SOME_CLASS_SET") as stub, mox.expect:
             TestClass.SOME_CLASS_SET.__contains__("x").returns(True)
 
         dummy = TestClass()
 
         result = "x" in dummy.SOME_CLASS_SET
 
-        m.verify_all()
+        mox.verify(stub)
 
         assert result is True
 
     def test_stub_out__signature_matching_init_(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper.ExampleClass, "__init__")
+        with mox.stubout(mox_test_helper.ExampleClass, "__init__") as stub:
+            ...
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.ExampleClass.__init__(mox.IgnoreArg())
 
         # Create an instance of a child class, which calls the parent
         # __init__
         mox_test_helper.ChildExampleClass()
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_class__old_style(self):
         """Test a mocked class whose __init__ returns a Mock."""
-        with mox.create as m:
-            m.stubout(mox_test_helper, "TestClassFromAnotherModule")
+        with mox.stubout(mox_test_helper, "TestClassFromAnotherModule") as stub:
+            ...
         assert isinstance(mox_test_helper.TestClassFromAnotherModule, mox.MockObject)
 
-        mock_instance = m.create_mock(mox_test_helper.TestClassFromAnotherModule)
+        mock_instance = mox.create(mox_test_helper.TestClassFromAnotherModule)
 
-        with m.expect:
+        with mox.expect(stub, mock_instance):
             mox_test_helper.TestClassFromAnotherModule().returns(mock_instance)
             mock_instance.value().returns("mock instance")
 
         a_mock = mox_test_helper.TestClassFromAnotherModule()
         actual = a_mock.value()
 
+        m = mox.Mox._instances[stub._mox_id]
         m.verify_all()
         m.unset_stubs()
+        mox.verify(mock_instance)
         assert "mock instance" == actual
 
     def test_stub_out_class(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableClass")
+        with mox.stubout.klass(mox_test_helper, "CallableClass") as stub:
+            # Instance one
+            mock_one = mox_test_helper.CallableClass(1, 2)
+            # Instance two
+            mock_two = mox_test_helper.CallableClass(8, 9)
 
-        # Instance one
-        mock_one = mox_test_helper.CallableClass(1, 2)
-        # Instance two
-        mock_two = mox_test_helper.CallableClass(8, 9)
-
-        with m.expect:
             mock_one.value().returns("mock")
             mock_two("one").returns("called mock")
 
@@ -3702,6 +3633,7 @@ class MoxContextManagerTest:
         two = mox_test_helper.CallableClass(8, 9)
         actual_two = two("one")
 
+        m = mox.Mox._instances[stub._mox_id]
         m.verify_all()
         m.unset_stubs()
 
@@ -3714,17 +3646,14 @@ class MoxContextManagerTest:
         assert actual_two == "called mock"
 
     def test_stub_out_class_with_meta_class(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "ChildClassWithMetaClass")
-
-        mock_one = mox_test_helper.ChildClassWithMetaClass(kw=1)
-
-        with m.expect:
+        with mox.stubout.klass(mox_test_helper, "ChildClassWithMetaClass") as stub:
+            mock_one = mox_test_helper.ChildClassWithMetaClass(kw=1)
             mock_one.value().returns("mock")
 
         one = mox_test_helper.ChildClassWithMetaClass(kw=1)
         actual_one = one.value()
 
+        m = mox.Mox._instances[stub._mox_id]
         m.verify_all()
         m.unset_stubs()
 
@@ -3736,13 +3665,9 @@ class MoxContextManagerTest:
         assert one.x == "meta"
 
     def test_stub_out_class__a_b_c_meta(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableSubclassOfMyDictABC")
-
-        mock_foo = mox_test_helper.CallableSubclassOfMyDictABC(foo="!mock bar")
-        mock_spam = mox_test_helper.CallableSubclassOfMyDictABC(spam="!mock eggs")
-
-        with m.expect:
+        with mox.stubout.klass(mox_test_helper, "CallableSubclassOfMyDictABC") as stub:
+            mock_foo = mox_test_helper.CallableSubclassOfMyDictABC(foo="!mock bar")
+            mock_spam = mox_test_helper.CallableSubclassOfMyDictABC(spam="!mock eggs")
             mock_foo["foo"].returns("mock bar")
             mock_spam("beans").returns("called mock")
 
@@ -3752,6 +3677,7 @@ class MoxContextManagerTest:
         spam = mox_test_helper.CallableSubclassOfMyDictABC(spam="!mock eggs")
         actual_spam = spam("beans")
 
+        m = mox.Mox._instances[stub._mox_id]
         m.verify_all()
         m.unset_stubs()
 
@@ -3764,67 +3690,74 @@ class MoxContextManagerTest:
         assert "called mock" == actual_spam
 
     def test_stub_out_class_not_enough_created(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableClass")
+        with mox.stubout.klass(mox_test_helper, "CallableClass") as stub:
+            ...
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.CallableClass(1, 2)
             mox_test_helper.CallableClass(8, 9)
 
         mox_test_helper.CallableClass(1, 2)
 
-        assert len(m.stubs.cache) == 1
+        m = mox.Mox._instances[stub._mox_id]
+        len(m.stubs.cache) == 1
         with pytest.raises(mox.ExpectedMockCreationError):
-            m.verify_all()
-        assert len(m.stubs.cache) == 0
+            mox.verify(stub)
+        len(m.stubs.cache) == 0
 
     def test_stub_out_class_wrong_signature(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableClass")
+        with mox.stubout.klass(mox_test_helper, "CallableClass") as stub:
+            with pytest.raises(AttributeError):
+                mox_test_helper.CallableClass()
+        # m = mox.Mox()
+        #
+        # m.stubout_class(mox_test_helper, "CallableClass")
+        # with pytest.raises(AttributeError):
+        #     mox_test_helper.CallableClass()
 
-        with pytest.raises(AttributeError):
-            mox_test_helper.CallableClass()
-
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_class_wrong_parameters(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableClass")
+        with mox.stubout.klass(mox_test_helper, "CallableClass") as stub:
+            ...
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.CallableClass(1, 2)
 
         with pytest.raises(mox.UnexpectedMethodCallError):
             mox_test_helper.CallableClass(8, 9)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_class_too_many_created(self):
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableClass")
+        with mox.stubout.klass(mox_test_helper, "CallableClass") as stub:
+            ...
 
-        with m.expect:
+        with stub._expect:
             mox_test_helper.CallableClass(1, 2)
 
         mox_test_helper.CallableClass(1, 2)
         with pytest.raises(mox.UnexpectedMockCreationError):
             mox_test_helper.CallableClass(8, 9)
 
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_warns_user_if_mocking_mock(self):
         """Test that user is warned if they try to stub out a MockAnything."""
-        with mox.create as m:
-            m.stubout(TestClass, "my_static_method")
-        with pytest.raises(TypeError):
-            m.stubout(TestClass, "my_static_method")
+        with mox.stubout(TestClass, "my_static_method"):
+            with pytest.raises(TypeError):
+                with mox.stubout(TestClass, "my_static_method"):
+                    ...
 
     def test_stub_out_first_class_method_verifies_signature(self):
-        with mox.create as m:
-            m.stubout(mox_test_helper, "MyTestFunction")
-
-        # Wrong number of arguments
-        with pytest.raises(AttributeError):
-            mox_test_helper.MyTestFunction(1)
+        with mox.stubout(mox_test_helper, "MyTestFunction") as stub:
+            # Wrong number of arguments
+            with pytest.raises(AttributeError):
+                mox_test_helper.MyTestFunction(1)
+        m = mox.Mox._instances[stub._mox_id]
+        m.verify_all()
         m.unset_stubs()
 
     @pytest.mark.parametrize(
@@ -3850,19 +3783,20 @@ class MoxContextManagerTest:
         # If stub_class is true, the test is run against a stubbed out class,
         # else the test is run against a stubbed out instance.
         if stub_class:
-            with mox.create as m:
-                m.stubout(mox_test_helper.ExampleClass, "test_method")
-            obj = mox_test_helper.ExampleClass()
+            with mox.stubout(mox_test_helper.ExampleClass, "test_method") as stub:
+                obj = mox_test_helper.ExampleClass()
         else:
             obj = mox_test_helper.ExampleClass()
-            with mox.create as m:
-                m.stubout(obj, "test_method")
+            with mox.stubout(obj, "test_method") as stub:
+                ...
 
-        if raises:
-            with pytest.raises(AttributeError):
+        with stub._expect:
+            if raises:
+                with pytest.raises(AttributeError):
+                    obj.test_method(*args, **kwargs)
+            else:
                 obj.test_method(*args, **kwargs)
-        else:
-            obj.test_method(*args, **kwargs)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
     def test_stub_out_object(self):
@@ -3873,30 +3807,29 @@ class MoxContextManagerTest:
                 self.obj = TestClass()
 
         foo = foo()
-        with mox.create as m:
-            m.stubout(foo, "obj")
+        with mox.stubout(foo, "obj") as stub:
+            ...
 
         assert isinstance(foo.obj, mox.MockObject)
 
-        with m.expect:
+        with stub._expect:
             foo.obj.valid_call()
 
         foo.obj.valid_call()
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
         assert not isinstance(foo.obj, mox.MockObject)
 
     def test_stub_out_re_works(self):
-        with mox.create as m:
-            m.stubout(re, "search")
-
-        with m.expect:
+        with mox.stubout(re, "search") as stub, mox.expect:
             re.search("a", "ivan").returns("true")
 
         result = TestClass().re_search()
 
-        m.verify_all()
+        mox.verify(stub)
+        m = mox.Mox._instances[stub._mox_id]
         m.unset_stubs()
 
         assert result == "true"
@@ -3904,9 +3837,8 @@ class MoxContextManagerTest:
     def test_forgot_replay_helpful_message(self):
         """If there is an AttributeError on a MockMethod, give users a helpful
         msg."""
-        with mox.create as m:
-            foo = m.create_mock_anything()
-            bar = m.create_mock_anything()
+        foo = mox.create.any()
+        bar = mox.create.any()
 
         foo.getbar().returns(bar)
         bar.show_me_the_money()
@@ -3921,9 +3853,7 @@ class MoxContextManagerTest:
 
     def test_swallowed_unknown_method_call(self):
         """Test that a swallowed UnknownMethodCallError will be re-raised."""
-        with mox.create as m:
-            dummy = m.create_mock(TestClass)
-
+        dummy = mox.create(TestClass)
         dummy._replay()
 
         def call():
@@ -3936,15 +3866,13 @@ class MoxContextManagerTest:
         call()
 
         with pytest.raises(mox.SwallowedExceptionError):
-            m.verify_all()
+            mox.verify(dummy)
 
     def test_swallowed_unexpected_mock_creation(self):
         """Test that a swallowed UnexpectedMockCreationError will be
         re-raised."""
-        with mox.create as m:
-            m.stubout_class(mox_test_helper, "CallableClass")
-
-        m.replay_all()
+        with mox.stubout.klass(mox_test_helper, "CallableClass") as stub:
+            ...
 
         def call():
             try:
@@ -3955,19 +3883,18 @@ class MoxContextManagerTest:
         # UnexpectedMockCreationError swallowed
         call()
 
-        assert len(m.stubs.cache) == 1
+        m = mox.Mox._instances[stub._mox_id]
+        len(m.stubs.cache) == 1
         with pytest.raises(mox.SwallowedExceptionError):
-            m.verify_all()
-        assert len(m.stubs.cache) == 0
+            mox.verify(stub)
+        len(m.stubs.cache) == 0
 
     def test_swallowed_unexpected_method_call__wrong_method(self):
         """Test that a swallowed UnexpectedMethodCallError will be re-raised.
 
         This case is an extraneous method call."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mock_obj._expect:
             mock_obj.open()
 
         def call():
@@ -3981,16 +3908,14 @@ class MoxContextManagerTest:
         call()
 
         with pytest.raises(mox.SwallowedExceptionError):
-            m.verify_all()
+            mox.verify(mock_obj)
 
     def test_swallowed_unexpected_method_call__wrong_arguments(self):
         """Test that a swallowed UnexpectedMethodCallError will be re-raised.
 
         This case is an extraneous method call."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mock_obj._expect:
             mock_obj.open()
 
         def call():
@@ -4003,16 +3928,14 @@ class MoxContextManagerTest:
         call()
 
         with pytest.raises(mox.SwallowedExceptionError):
-            m.verify_all()
+            mox.verify(mock_obj)
 
     def test_swallowed_unexpected_method_call__unordered_group(self):
         """Test that a swallowed UnexpectedMethodCallError will be re-raised.
 
         This case is an extraneous method call in an unordered group."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mock_obj._expect:
             mock_obj.open().any_order()
             mock_obj.close().any_order()
 
@@ -4027,16 +3950,14 @@ class MoxContextManagerTest:
         call()
 
         with pytest.raises(mox.SwallowedExceptionError):
-            m.verify_all()
+            mox.verify(mock_obj)
 
     def test_swallowed_unexpected_method_call__multiple_times_group(self):
         """Test that a swallowed UnexpectedMethodCallError will be re-raised.
 
         This case is an extraneous method call in a multiple times group."""
-        with mox.create as m:
-            mock_obj = m.create_mock_anything()
-
-        with m.expect:
+        mock_obj = mox.create.any()
+        with mock_obj._expect:
             mock_obj.open().multiple_times()
 
         def call():
@@ -4049,7 +3970,7 @@ class MoxContextManagerTest:
         call()
 
         with pytest.raises(mox.SwallowedExceptionError):
-            m.verify_all()
+            mox.verify(mock_obj)
 
 
 class ReplayTest(unittest.TestCase):
