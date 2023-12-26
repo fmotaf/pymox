@@ -1,9 +1,9 @@
 class Create:
     def __init__(self):
         # Internal imports
-        import mox
+        from .mox import Mox
 
-        self.m = mox.Mox()
+        self.m = Mox()
 
     def __call__(self, class_to_mock, attrs=None):
         return self.m.create_mock(class_to_mock, attrs)
