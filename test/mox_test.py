@@ -519,7 +519,7 @@ class MockMethodTest(unittest.TestCase):
         self.expected_method.and_raise(expected_exception)
 
         with pytest.raises(Exception, match="test exception"):
-            self.mock_method(['original'])
+            self.mock_method(["original"])
 
     def test_with_side_effects(self):
         """Should call state modifier."""
@@ -786,8 +786,7 @@ class MockAnythingTest(unittest.TestCase):
         self.mock_object._verify()
 
     def test_is_callable_with_called_with(self):
-        """Test is_callable, this time using .called_with()
-        """
+        """Test is_callable, this time using .called_with()"""
         self.mock_object.called_with().returns("mox0rd")
         self.mock_object._replay()
 
@@ -977,6 +976,7 @@ class MockObjectTest(unittest.TestCase):
 
         self.mock.replay_all()
         self.assertEqual(obj.distant_method._description, "FarAwayClass.distant_method")
+        self.mock.reset_all()
 
     def test_description_module_function(self):
         self.mock.stubout(mox_test_helper, "MyTestFunction")
@@ -987,6 +987,7 @@ class MockObjectTest(unittest.TestCase):
             mox_test_helper.MyTestFunction._description,
             "function test.mox_test_helper.MyTestFunction",
         )
+        self.mock.reset_all()
 
     def test_description_mocked_class(self):
         obj = FarAwayClass()
@@ -996,6 +997,7 @@ class MockObjectTest(unittest.TestCase):
 
         self.mock.replay_all()
         self.assertEqual(obj.distant_method._description, "FarAwayClass.distant_method")
+        self.mock.reset_all()
 
     def test_description_class_method(self):
         obj = mox_test_helper.SpecialClass()
@@ -1005,6 +1007,8 @@ class MockObjectTest(unittest.TestCase):
 
         self.mock.replay_all()
         self.assertEqual(obj.class_method._description, "SpecialClass.class_method")
+        self.mock.unset_stubs()
+        self.mock.reset_all()
 
     def test_description_static_method_mock_class(self):
         self.mock.stubout(mox_test_helper.SpecialClass, "static_method")
@@ -1015,6 +1019,7 @@ class MockObjectTest(unittest.TestCase):
             mox_test_helper.SpecialClass.static_method._description,
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
+        self.mock.reset_all()
 
     def test_description_static_method_mock_instance(self):
         obj = mox_test_helper.SpecialClass()
@@ -1027,6 +1032,7 @@ class MockObjectTest(unittest.TestCase):
             obj.static_method._description,
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
+        self.mock.reset_all()
 
     def test_mox_id(self):
         mock = mox.MockObject(TestClass)
@@ -1437,6 +1443,7 @@ class MockObjectContextManagerTest(unittest.TestCase):
 
         self.assertEqual(obj.distant_method._description, "FarAwayClass.distant_method")
         m.unset_stubs()
+        m.reset_all()
 
     def test_description_module_function(self):
         with mox.create as m:
@@ -1450,6 +1457,7 @@ class MockObjectContextManagerTest(unittest.TestCase):
             "function test.mox_test_helper.MyTestFunction",
         )
         m.unset_stubs()
+        m.reset_all()
 
     def test_description_mocked_class(self):
         obj = FarAwayClass()
@@ -1462,6 +1470,7 @@ class MockObjectContextManagerTest(unittest.TestCase):
 
         self.assertEqual(obj.distant_method._description, "FarAwayClass.distant_method")
         m.unset_stubs()
+        m.reset_all()
 
     def test_description_class_method(self):
         obj = mox_test_helper.SpecialClass()
@@ -1474,6 +1483,7 @@ class MockObjectContextManagerTest(unittest.TestCase):
 
         self.assertEqual(obj.class_method._description, "SpecialClass.class_method")
         m.unset_stubs()
+        m.reset_all()
 
     def test_description_static_method_mock_class(self):
         with mox.create as m:
@@ -1487,6 +1497,7 @@ class MockObjectContextManagerTest(unittest.TestCase):
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
         m.unset_stubs()
+        m.reset_all()
 
     def test_description_static_method_mock_instance(self):
         obj = mox_test_helper.SpecialClass()
@@ -1502,6 +1513,7 @@ class MockObjectContextManagerTest(unittest.TestCase):
             ["SpecialClass.static_method", "function test.mox_test_helper.static_method"],
         )
         m.unset_stubs()
+        m.reset_all()
 
     def test_replay_with_invalid_call(self):
         """UnknownMethodCallError should be raised if a non-member method is
@@ -1857,7 +1869,7 @@ class TestMoxMeta:
         assert len(mox.Mox._instances[id(m1)].stubs.cache) == 0
         assert len(mox.Mox._instances[id(m2)].stubs.cache) == 0
 
-    def test_unset_all_stubs(self):
+    def test_global_unset_stubs(self):
         m1 = mox.Mox()
         m2 = mox.Mox()
 
@@ -1867,10 +1879,31 @@ class TestMoxMeta:
         assert len(mox.Mox._instances[id(m1)].stubs.cache) == 1
         assert len(mox.Mox._instances[id(m2)].stubs.cache) == 1
 
-        mox.Mox.unset_all_stubs()
+        mox.Mox.global_unset_stubs()
 
         assert len(mox.Mox._instances[id(m1)].stubs.cache) == 0
         assert len(mox.Mox._instances[id(m2)].stubs.cache) == 0
+
+    def test_global_verify(self):
+        m1 = mox.Mox()
+        m2 = mox.Mox()
+
+        m1.stubout(TestClass, "valid_call")
+        m2.stubout(TestClass, "other_valid_call")
+        m1.stubout(m1, "verify_all")
+        m2.stubout(m2, "verify_all")
+
+        test = TestClass()
+        test.valid_call()
+        test.other_valid_call()
+        m1.verify_all()
+        m2.verify_all()
+
+        m1.replay_all()
+        m2.replay_all()
+
+        mox.Mox.global_verify()
+        mox.Mox.global_unset_stubs()
 
 
 class MoxTest(unittest.TestCase):

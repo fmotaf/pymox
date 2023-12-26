@@ -107,10 +107,14 @@ class _MoxManagerMeta(type):
         mox_instance = cls._instances[mox_id]
         mox_instance.unset_stubs()
 
-    def unset_all_stubs(cls):
+    def global_unset_stubs(cls):
         for mox_instance in cls._instances.values():
             mox_instance.stubs.unset_all()
             mox_instance.stubs.smart_unset_all()
+
+    def global_verify(cls):
+        for mox_instance in cls._instances.values():
+            mox_instance.verify_all()
 
 
 class Mox(metaclass=_MoxManagerMeta):
