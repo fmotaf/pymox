@@ -43,7 +43,7 @@ class MoxMetaTestBase(type):
           The modified method.
         """
         # Internal imports
-        from mox import Mox, stubout
+        from mox import Mox, stubbingout
 
         def new_method(self, *args, **kwargs):
             mox_obj = getattr(self, "mox", None)
@@ -52,7 +52,7 @@ class MoxMetaTestBase(type):
             cleanup_stubout = False
             if mox_obj and isinstance(mox_obj, Mox):
                 cleanup_mox = True
-            if stubout_obj and isinstance(stubout_obj, stubout.StubOutForTesting):
+            if stubout_obj and isinstance(stubout_obj, stubbingout.StubOutForTesting):
                 cleanup_stubout = True
             try:
                 func(self, *args, **kwargs)
@@ -88,8 +88,8 @@ class MoxTestBase(_MoxTestBase):
 
     def setUp(self):
         # Internal imports
-        from mox import Mox, stubout
+        from mox import Mox, stubbingout
 
         super(MoxTestBase, self).setUp()
         self.mox = Mox()
-        self.stubs = stubout.StubOutForTesting()
+        self.stubs = stubbingout.StubOutForTesting()

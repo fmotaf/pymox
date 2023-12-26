@@ -44,18 +44,18 @@ Suggested usage / workflow:
   my_mox = Mox()
 
   # Create a mock data access object
-  mock_dao = my_mox.CreateMock(DAOClass)
+  mock_dao = my_mox.create_mock(DAOClass)
 
   # Set up expected behavior
-  mock_dao.RetrievePersonWithIdentifier('1').AndReturn(person)
-  mock_dao.DeletePerson(person)
+  mock_dao.retrieve_person_with_identifier("1").and_return(person)
+  mock_dao.delete_person(person)
 
   # Put mocks in replay mode
-  my_mox.ReplayAll()
+  my_mox.replay_all()
 
   # Inject mock object and run test
-  controller.SetDao(mock_dao)
-  controller.DeletePersonById('1')
+  controller.set_dao(mock_dao)
+  controller.delete_person_by_id("1")
 
   # Verify all methods were called as expected
   my_mox.verify_all()
@@ -67,9 +67,8 @@ import types
 from collections import deque
 from re import search as re_search
 
-from . import stubout
+from . import stubbingout
 from .comparators import IsA
-from .contextmanagers import Create, Expect, MockObjectExpect
 from .exceptions import (
     Error,
     ExpectedMethodCallsError,
@@ -86,18 +85,6 @@ from .groups import MethodGroup, MultipleTimesGroup, UnorderedGroup
 class _MoxManagerMeta(type):
     _instances = {}
 
-    @property
-    def create(cls):
-        return Create(cls())
-
-    def __new__(cls, name, bases, dct):
-        obj = super(_MoxManagerMeta, cls).__new__(cls, name, bases, dct)
-
-        expect = property(lambda self: Expect(mox_obj=self))
-        setattr(obj, "expect", expect)
-
-        return obj
-
     def __call__(cls, *args, **kwargs):
         instance = super(_MoxManagerMeta, cls).__call__(*args, **kwargs)
         cls._instances[id(instance)] = instance
@@ -107,10 +94,18 @@ class _MoxManagerMeta(type):
         mox_instance = cls._instances[mox_id]
         mox_instance.unset_stubs()
 
-    def unset_all_stubs(cls):
+    def global_unset_stubs(cls):
         for mox_instance in cls._instances.values():
             mox_instance.stubs.unset_all()
             mox_instance.stubs.smart_unset_all()
+
+    def global_replay(cls):
+        for mox_instance in cls._instances.values():
+            mox_instance.replay_all()
+
+    def global_verify(cls):
+        for mox_instance in cls._instances.values():
+            mox_instance.verify_all()
 
 
 class Mox(metaclass=_MoxManagerMeta):
@@ -141,7 +136,7 @@ class Mox(metaclass=_MoxManagerMeta):
         """Initialize a new Mox."""
 
         self._mock_objects = []
-        self.stubs = stubout.StubOutForTesting()
+        self.stubs = stubbingout.StubOutForTesting()
 
     def create_mock(self, class_to_mock, attrs=None):
         """Create a new mock object.
@@ -173,6 +168,13 @@ class Mox(metaclass=_MoxManagerMeta):
         new_mock = MockAnything(description=description, _mox_id=id(self))
         self._mock_objects.append(new_mock)
         return new_mock
+
+    @property
+    def expect(self):
+        # Internal imports
+        from mox.contextmanagers import Expect
+
+        return Expect.from_mox(mox_obj=self)
 
     def replay_all(self):
         """Set all mock objects to replay mode."""
@@ -234,6 +236,7 @@ class Mox(metaclass=_MoxManagerMeta):
             stub.__name__ = attr_name
 
         self.stubs.set(obj, attr_name, stub)
+        return stub
 
     def stubout_class(self, obj, attr_name):
         """Replace a class with a "mock factory" that will create mock objects.
@@ -284,6 +287,7 @@ class Mox(metaclass=_MoxManagerMeta):
         factory = _MockObjectFactory(attr_to_replace, self)
         self._mock_objects.append(factory)
         self.stubs.set(obj, attr_name, factory)
+        return factory
 
     def unset_stubs(self):
         """Restore stubs to their original state."""
@@ -446,6 +450,13 @@ class MockAnything:
 
         return not self == rhs
 
+    @property
+    def _expect(self):
+        # Internal imports
+        from mox.contextmanagers import Expect
+
+        return Expect(self)
+
     def _replay(self):
         """Start replaying expected method calls."""
 
@@ -488,6 +499,13 @@ class MockAnything:
 
         # Make sure we are in setup mode, not replay mode
         self._replay_mode = False
+
+    @property
+    def to_be(self):
+        return self
+
+    def called_with(self, *args, **kwargs):
+        return self(*args, **kwargs)
 
     _Replay = _replay
     _Verify = _verify
@@ -597,10 +615,6 @@ class MockObject(MockAnything, object):
           UnknownMethodCallError if the MockObject does not mock the requested
               method.
         """
-
-        if name == "_expect":
-            return MockObjectExpect(self)
-
         if name in self._known_vars:
             return getattr(self._class_to_mock, name)
 
@@ -825,6 +839,7 @@ class _MockObjectFactory(MockObject):
     def __init__(self, class_to_mock, mox_instance):
         MockObject.__init__(self, class_to_mock)
         self._mox = mox_instance
+        self._mox_id = id(mox_instance)
         self._instance_queue = deque()
 
     def __call__(self, *params, **named_params):
@@ -1290,6 +1305,10 @@ class MockMethod(object):
         self._return_value = return_value
         return return_value
 
+    def and_return(self, return_value):
+        """Semantic sugar for returns."""
+        return self.returns(return_value)
+
     def raises(self, exception):
         """Set the exception to raise when this method is called.
 
@@ -1299,6 +1318,10 @@ class MockMethod(object):
         """
 
         self._exception = exception
+
+    def and_raise(self, exception):
+        """Semantic sugar for raises."""
+        return self.raises(exception)
 
     def with_side_effects(self, side_effects):
         """Set the side effects that are simulated when this method is called.

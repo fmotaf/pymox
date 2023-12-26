@@ -19,7 +19,7 @@ import unittest
 
 # Internal imports
 import mox
-from mox import stubout
+from mox import stubbingout
 
 from . import stubout_testee
 
@@ -36,7 +36,7 @@ class StubOutForTestingTest(unittest.TestCase):
         mock_function = self.mox.create_mock_anything()
         mock_function()
 
-        stubber = stubout.stubout()
+        stubber = stubbingout.stubout()
         stubber.smart_set(stubout_testee, "sample_function", mock_function)
 
         self.mox.replay_all()
