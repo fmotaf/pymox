@@ -67,7 +67,7 @@ import types
 from collections import deque
 from re import search as re_search
 
-from . import stubout
+from . import stubbingout
 from .comparators import IsA
 from .contextmanagers import Create, Expect, MockObjectExpect
 from .exceptions import (
@@ -145,7 +145,7 @@ class Mox(metaclass=_MoxManagerMeta):
         """Initialize a new Mox."""
 
         self._mock_objects = []
-        self.stubs = stubout.StubOutForTesting()
+        self.stubs = stubbingout.StubOutForTesting()
 
     def create_mock(self, class_to_mock, attrs=None):
         """Create a new mock object.

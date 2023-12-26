@@ -4070,7 +4070,7 @@ class MoxTestBaseTest(unittest.TestCase):
     def setUp(self):
         self.mox = mox.Mox()
         self.test_mox = mox.Mox()
-        self.test_stubs = mox.stubout.stubout()
+        self.test_stubs = mox.stubbingout.stubout()
         self.result = unittest.TestResult()
 
     def tearDown(self):
@@ -4221,7 +4221,7 @@ class MoxTestBaseContextManagerTest(unittest.TestCase):
     def setUp(self):
         self.mox = mox.Mox()
         self.test_mox = mox.Mox()
-        self.test_stubs = mox.stubout.stubout()
+        self.test_stubs = mox.stubbingout.stubout()
         self.result = unittest.TestResult()
 
     def tearDown(self):
