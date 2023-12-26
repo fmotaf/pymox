@@ -1,5 +1,6 @@
 class Create:
     def __init__(self):
+        # Internal imports
         import mox
 
         self.m = mox.Mox()
@@ -16,6 +17,7 @@ create = Create()
 
 class Stubout:
     def __init__(self, *stub, _class=False):
+        # Internal imports
         import mox
 
         self.stubs = [stub] if stub else []
@@ -64,6 +66,7 @@ class Expect:
         self.mox_obj = mox_obj
 
     def __enter__(self):
+        # Internal imports
         import mox
 
         mox.reset(*self.stubs)
@@ -75,6 +78,7 @@ class Expect:
         return self.stubs
 
     def __exit__(self, exc_type, exc_value, exc_tb):
+        # Internal imports
         import mox
 
         if not self.mox_obj and not self.stubs:

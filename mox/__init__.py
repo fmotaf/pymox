@@ -34,6 +34,7 @@ from .comparators import (  # noqa: F401
     str_contains,
     value,
 )
+from .contextmanagers import create, expect, stubout  # noqa: F401
 from .exceptions import (  # noqa: F401
     Error,
     ExpectedMethodCallsError,
@@ -60,6 +61,3 @@ from .mox import (  # noqa: F401
     verify,
 )
 from .testing.unittest_mox import MoxMetaTestBase, MoxTestBase  # noqa: F401
-
-
-from .contextmanagers import create, expect, stubout  # noqa: F401

@@ -171,6 +171,7 @@ class Mox(metaclass=_MoxManagerMeta):
 
     @property
     def expect(self):
+        # Internal imports
         from mox.contextmanagers import Expect
 
         return Expect.from_mox(mox_obj=self)
@@ -451,6 +452,7 @@ class MockAnything:
 
     @property
     def _expect(self):
+        # Internal imports
         from mox.contextmanagers import Expect
 
         return Expect(self)
