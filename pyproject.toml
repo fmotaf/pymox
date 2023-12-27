@@ -9,7 +9,10 @@ dynamic = ["version"]
 [tool.poetry]
 name = "pymox"
 description = "Mock object framework"
-packages = [{include = "mox"}]
+packages = [
+    {include = "mox"},
+    {include = "mox/testing"}
+]
 version = "0.0.0"  # DO NOT CHANGE VERSION HERE
 authors = ["Ivan Neto <ivan.cr.neto@gmail.com>"]
 license = "Apache License, Version 2.0"
