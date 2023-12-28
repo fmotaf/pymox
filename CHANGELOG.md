@@ -2,6 +2,7 @@
 
 ## 1.3.0
 
+-   Python 3.12 is now supported
 -   Python 3.5 and 3.6 are no longer supported
 -   Reworked documentation
 
@@ -13,7 +14,7 @@
 
 -   Reworked README
 -   Added `to_be`, `called_with`, `and_return` and `and_raise`
--   Methods `stubout` and `stubout_class` now return the stubs 
+-   Methods `stubout` and `stubout_class` now return the stubs
 -   Added `global_unset_stubs` and `global_verify` to the Mox metaclass
 -   Added minimal `pytest` support
 -   Added requirements file to build docs

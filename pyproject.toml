@@ -26,8 +26,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -46,22 +44,16 @@ readme = "README.rst"
 
 [tool.poetry.dependencies]
 setuptools_scm = { version = "^8.0", python = ">=3.8,<4" }
-python = ">=3.5, <4"
+python = ">=3.7, <4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = [
-    {version = "^3.2", python = "<3.6"},
-    {version = "^6.1", python = "==3.6"},
     {version = "^7.1", python = ">=3.7"}
 ]
 pytest-cov = [
-    {version = "^2.5", python = "<3.6"},
-    {version = "^3.0", python = "==3.6"},
     {version = "^4.0", python = ">=3.7"}
 ]
 coverage = [
-    {version = "^4.5", python = "<3.6"},
-    {version = "^6.1", python = "==3.6"},
     {version = "^7.2", python = ">=3.7"}
 ]
 
@@ -83,7 +75,7 @@ addopts = [
 
 [tool.black]
 line-length = 120
-target-version = [ "py35" ]
+target-version = [ "py37" ]
 
 
 [tool.isort]
