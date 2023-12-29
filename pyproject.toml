@@ -40,7 +40,7 @@ classifiers = [
 keywords = [
     "mox", "mock", "test", "mocking", "unittest", "pymox",
 ]
-readme = "README.rst"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 setuptools_scm = { version = "^8.0", python = ">=3.8,<4" }
