@@ -36,8 +36,15 @@ jobs:
          poetry config virtualenvs.path ~/.virtualenvs
 
       - name: Install Dependencies
-        run: poetry install
+        run: poetry install --group dev
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Test with pytest
         run: poetry run pytest
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-pymox
+          fail_ci_if_error: true
+          verbose: true

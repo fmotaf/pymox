@@ -65,9 +65,10 @@ addopts = [
     "-v",
     "--cov-config",
     ".coveragerc",
+    "--junit-xml=coverage.xml",
     "--cov=mox",
     "--cov-branch",
-    "--cov-report",
+    "--cov-report=xml",
     "term-missing",
     "test/mox_test.py"
 ]
