@@ -60,16 +60,16 @@ coverage = [
 [tool.setuptools_scm]
 write_to = "mox/__version__.py"
 
-[tool.pytest]
+[tool.pytest.ini_options]
 addopts = [
-    "-v",
+    "-vv",
     "--cov-config",
     ".coveragerc",
+    "--junit-xml=coverage.xml",
     "--cov=mox",
     "--cov-branch",
-    "--cov-report",
-    "term-missing",
-    "test/mox_test.py"
+    "--cov-report=xml",
+    "test"
 ]
 
 
