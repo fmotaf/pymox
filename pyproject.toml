@@ -63,9 +63,6 @@ write_to = "mox/__version__.py"
 [tool.pytest.ini_options]
 addopts = [
     "-vv",
-    "--cov-config",
-    ".coveragerc",
-    "--junit-xml=coverage.xml",
     "--cov=mox",
     "--cov-branch",
     "--cov-report=xml",
