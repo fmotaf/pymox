@@ -39,16 +39,26 @@ jobs:
         run: poetry install --group dev
         if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Test with pytest
+#      - name: Test with pytest
+#        run: poetry run pytest
+      - name: Run tests and collect coverage
+        # run: poetry run pytest --cov app ${{ env.CODECOV_ATS_TESTS }}
         run: poetry run pytest
-
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4-beta
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: .
-          flags: unittests
-          name: codecov-pymox
-          fail_ci_if_error: true
+          flags: smart-tests
           verbose: true
-          files: ./coverage.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v3
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+#          directory: .
+#          flags: unittests
+#          name: codecov-pymox
+#          fail_ci_if_error: true
+#          verbose: true
+#          files: ./coverage.xml
