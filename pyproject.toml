@@ -1,10 +1,11 @@
 [build-system]
-requires = ["setuptools>=58.2.0", "setuptools_scm[toml]>=6.2", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "pymox"
 dynamic = ["version"]
+description = "Python mocking on steroids"
 
 [tool.poetry]
 name = "pymox"
@@ -43,7 +44,9 @@ keywords = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-setuptools_scm = { version = "^8.0", python = ">=3.8,<4" }
+hatch = { version = "^1.9.1", python = ">=3.9,<4" }
+hatchling = { version = "^1.21.0", python = ">=3.8,<4" }
+hatch-semver = { version = "^1.0.1",  python = ">=3.9,<4" }
 python = ">=3.7, <4"
 
 [tool.poetry.group.dev.dependencies]
@@ -57,8 +60,11 @@ coverage = [
     {version = "^7.2", python = ">=3.7"}
 ]
 
-[tool.setuptools_scm]
-write_to = "mox/__version__.py"
+[tool.hatch.version]
+path = "hatch/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mox", "mox/testing"]
 
 [tool.pytest.ini_options]
 addopts = [
