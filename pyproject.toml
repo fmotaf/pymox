@@ -66,8 +66,10 @@ addopts = [
     "--cov=mox",
     "--cov-branch",
     "--cov-report=xml",
+    "--ignore-glob=*_helper.py",
     "test"
 ]
+python_files = "*test*.py"
 
 
 [tool.black]
