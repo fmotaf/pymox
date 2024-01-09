@@ -1,6 +1,8 @@
+# Python imports
 import pkgutil
 from functools import partial, wraps
 
+# Internal imports
 from mox.exceptions import ObjectResolutionError
 
 
@@ -29,7 +31,7 @@ def resolve_object(func):
         if "attr_name" in kwargs:
             attr_name = kwargs.pop("attr_name")
 
-        if type(obj) == str:
+        if isinstance(obj, str):
             path = f"{obj.attr_name}" if attr_name else obj
             obj, attr_name = import_object(path)
             obj = obj()

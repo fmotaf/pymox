@@ -34,7 +34,7 @@ class Stubout:
             if len(stub_args) >= 3:
                 obj, attr_name, *use_mock_anything = stub_args
             elif len(stub_args) == 2:
-                if type(stub_args[0]) == str:
+                if isinstance(stub_args[0], str):
                     obj = stub_args[0]
                     attr_name = None
                     use_mock_anything = stub_args[1]

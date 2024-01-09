@@ -6,6 +6,7 @@ import pytest
 
 # Internal imports
 import mox
+
 from . import mox_test_helper
 from .test_helpers.subpackage.faraway import FarAwayClass
 
