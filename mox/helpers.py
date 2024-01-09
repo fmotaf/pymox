@@ -1,5 +1,6 @@
 # Python imports
 import pkgutil
+import sys
 from functools import partial, wraps
 
 # Internal imports
@@ -13,6 +14,9 @@ def resolve_object(func):
         try:
             obj, attribute = path.rsplit(".", 1)
         except (TypeError, ValueError, AttributeError):
+            raise ObjectResolutionError(path)
+
+        if sys.version_info < (3, 9):
             raise ObjectResolutionError(path)
         return partial(pkgutil.resolve_name, obj), attribute
 
