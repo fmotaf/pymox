@@ -31,7 +31,19 @@ class Stubout:
             method = getattr(self.m, "stubout")
 
         for stub_args in self.stubs:
-            obj, attr_name, *use_mock_anything = stub_args
+            if len(stub_args) >= 3:
+                obj, attr_name, *use_mock_anything = stub_args
+            elif len(stub_args) == 2:
+                if type(stub_args[0]) == str:
+                    obj = stub_args[0]
+                    attr_name = None
+                    use_mock_anything = stub_args[1]
+                else:
+                    obj, attr_name, *use_mock_anything = stub_args
+            else:
+                obj = stub_args[0]
+                attr_name = None
+                use_mock_anything = False
             kwargs = {} if self._class else {"use_mock_anything": bool(use_mock_anything)}
 
             stub_obj = method(obj=obj, attr_name=attr_name, **kwargs)
