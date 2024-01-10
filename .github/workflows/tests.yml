@@ -44,7 +44,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta
         with:
-          flags: pymox-tests-${{ matrix.python-version }}
+          flags: pymox-tests
           fail_ci_if_error: true
           verbose: true
         env:
