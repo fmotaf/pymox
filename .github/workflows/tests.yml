@@ -34,6 +34,7 @@ jobs:
         run: |
          poetry config virtualenvs.in-project false
          poetry config virtualenvs.path ~/.virtualenvs
+         poetry add --group dev 'pymox'
 
       - name: Install Dependencies
         run: poetry install --group dev
