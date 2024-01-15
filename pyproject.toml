@@ -101,3 +101,4 @@ sections = [
 
 [tool.bandit.assert_used]
 excludes = ['*_test.py', '*/test_*.py']
+
