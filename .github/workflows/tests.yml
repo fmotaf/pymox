@@ -41,6 +41,11 @@ jobs:
 
       - name: Run tests and collect coverage
         run: poetry run pytest
+
+      - name: Prepare coverage token
+        if: success() && github.repository == 'ivancrneto/pymox'
+        run: cp .github/codecov-upstream.yml codecov.yml
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta
         with:
