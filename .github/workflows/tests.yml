@@ -44,13 +44,18 @@ jobs:
 
       - name: Prepare coverage token
         if: success() && github.repository == 'ivancrneto/pymox'
-        run: cp .github/codecov-upstream.yml codecov.yml
+        run: cp .github/codecov-token.txt .
+
+      - name: Read file contents
+        id: read_file
+        uses: andstor/file-reader-action@v1
+        with:
+          path: "codecov-token.txt"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4-beta
+        uses: codecov/codecov-action@v3
         with:
           flags: pymox-tests
           fail_ci_if_error: true
           verbose: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          xtra_args: -t ${{ steps.read_file.outputs.contents }}
