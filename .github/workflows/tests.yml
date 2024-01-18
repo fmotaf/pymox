@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v3
@@ -36,16 +36,26 @@ jobs:
          poetry config virtualenvs.path ~/.virtualenvs
 
       - name: Install Dependencies
-        run: poetry install --group dev
+        run: poetry install --with dev
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Run tests and collect coverage
         run: poetry run pytest
+
+      - name: Prepare coverage token
+        if: success() && github.repository == 'ivancrneto/pymox'
+        run: cp .github/codecov-token.txt .
+
+      - name: Read file contents
+        id: read_file
+        uses: andstor/file-reader-action@v1
+        with:
+          path: "codecov-token.txt"
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta
         with:
           flags: pymox-tests
           fail_ci_if_error: true
           verbose: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ steps.read_file.outputs.contents }}
