@@ -4,6 +4,7 @@ Python mocking on steroids.
 ![python-versions](https://img.shields.io/pypi/pyversions/pymox.svg)
 ![Documentation
 Status](https://readthedocs.org/projects/pymox/badge/?version=latest)
+[![codecov](https://codecov.io/github/ivancrneto/pymox/graph/badge.svg?token=LXkOUCeOXK)](https://codecov.io/github/ivancrneto/pymox)
 
 <!-- summary -->
 
@@ -129,7 +130,7 @@ class TestSevice:
 
     def test_get_contacts_comparators_and_func_in_is_a(self):
         with stubout(Client, 'get') as m_get:
-            url = mox.func(lambda v: str.startswith('https://my.reallylong.service/'))
+            url = mox.func(lambda v: str.startswith(v, 'https://my.reallylong.service/'))
             params = mox.and_(
                 mox.is_a(dict),
                 mox.in_('added'),
@@ -142,8 +143,8 @@ class TestSevice:
 
     def test_get_contacts_comparators_ignore_arg_not(self):
         with stubout(Client, 'get') as m_get:
-            url = mox.ignore_arg
-            params = mox.not_(None)
+            url = mox.ignore_arg()
+            params = mox.not_(mox.is_(None))
             m_get(url, params).returns({})
 
         service = Service()
@@ -231,8 +232,8 @@ class Manager:
             handler.send(modified)
 
 
-class TestList(mox.MoxTestBase):
-    def test_getcwd(self):
+class TestManager(mox.MoxTestBase):
+    def test_manager_process(self):
         mydict = {1: "apple", 4: "banana", 6: {2: 3, 4: {1: "orange", 7: 8}}, 8: 3}
         myvalue = mox.value()
 
@@ -306,4 +307,4 @@ if __name__ == '__main__':
 * [PyPI](https://pypi.org/project/pymox/)
 * [GitHub](https://github.com/ivancrneto/pymox/)
 * [Documentation](http://pymox.rtfd.io/)
-* [Changelog](https://github.com/ivancrneto/pymox/blob/main/CHANGELOG.rst)
+* [Changelog](https://github.com/ivancrneto/pymox/blob/main/CHANGELOG.md)
