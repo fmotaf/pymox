@@ -49,6 +49,8 @@ class ExampleMoxTestMixin(object):
 
 
 class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
+    __test__ = False
+
     DIR_PATH = "/path/to/some/directory"
 
     def test_success(self):
@@ -221,8 +223,9 @@ class TestClass:
     SOME_CLASS_VAR = "test_value"
     _PROTECTED_CLASS_VAR = "protected value"
 
-    def __init__(self, ivar=None):
+    def __init__(self, ivar=None, parent=None):
         self.__ivar = ivar
+        self.parent = parent
 
     def __eq__(self, rhs):
         return self.__ivar == rhs

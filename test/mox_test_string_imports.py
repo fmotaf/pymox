@@ -195,7 +195,7 @@ class TestMockObjectContextManagerStringImports:
 
 
 @pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
-class TestMox:
+class TestMoxStringImports:
     """Verify Mox works correctly with string imports."""
 
     def test_stub_out_method__unbound__subclass__comparator(self, mock):
