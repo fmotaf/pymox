@@ -18,6 +18,48 @@ def mock():
 
 
 @pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
+class TestStringimports:
+    def test_existing_function(self):
+        with mox.stubout("test.test_helpers.subpackage.faraway.FarAwayClass.distant_method") as mock_distant_method:
+            mock_distant_method().returns(True)
+
+        obj = FarAwayClass()
+        assert obj.distant_method() is True
+
+    def test_missing_function(self):
+        with pytest.raises(AttributeError, match="type object 'FarAwayClass' has no attribute 'missing_method'"):
+            with mox.stubout("test.test_helpers.subpackage.faraway.FarAwayClass.missing_method") as mock_distant_method:
+                mock_distant_method().returns(True)
+
+    def test_missing_class(self):
+        with pytest.raises(
+            AttributeError, match="module 'test.test_helpers.subpackage.faraway' has no attribute 'MissingClass'"
+        ):
+            with mox.stubout("test.test_helpers.subpackage.faraway.MissingClass.distant_method") as mock_distant_method:
+                mock_distant_method().returns(True)
+
+    def test_missing_module(self):
+        with pytest.raises(AttributeError, match="module 'test.test_helpers.subpackage' has no attribute 'missing'"):
+            with mox.stubout("test.test_helpers.subpackage.missing.FarAwayClass.distant_method") as mock_distant_method:
+                mock_distant_method().returns(True)
+
+    def test_missing_package(self):
+        with pytest.raises(AttributeError, match="module 'test.test_helpers' has no attribute 'missing_package'"):
+            with mox.stubout(
+                "test.test_helpers.missing_package.faraway.FarAwayClass.distant_method"
+            ) as mock_distant_method:
+                mock_distant_method().returns(True)
+
+    def test_object_resolution_error(self):
+        with pytest.raises(
+            mox.exceptions.ObjectResolutionError,
+            match="Could not resolve class, object or module from supplied reference",
+        ):
+            with mox.stubout("testtest_helpersmissing_packagefarawayFarAwayClassdistant_method") as mock_distant_method:
+                mock_distant_method().returns(True)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
 class TestMockObjectStringImports:
     """Verify that the MockObject class works as expected with string imports."""
 
