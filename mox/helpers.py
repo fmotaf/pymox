@@ -10,7 +10,7 @@ from mox.exceptions import ObjectResolutionError
 _NAME_PATTERN = None
 
 
-def _resolve_name(name):
+def _resolve_name(name):  # pragma: no cover
     """
     Copied from pkg_util.resolve_name so it can be used with Python 3.8
 
