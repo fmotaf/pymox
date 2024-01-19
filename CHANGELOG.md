@@ -4,6 +4,7 @@
 
 -   Python 3.7 is no longer supported
 -   String imports: now it's possible to `stubout` passing the objects' string path
+-   Documentation improvements
 -   Other minor fixes
 
 ## 1.3.0

@@ -28,7 +28,7 @@ Coming Soon
 * Async support
 * Decorator
 * Ignore args
-* String imports
+* ~~String imports~~
 
 ## How
 
