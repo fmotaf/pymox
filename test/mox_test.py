@@ -3368,6 +3368,95 @@ class MoxContextManagerTest:
         assert "foo" == actual
         assert type(test_obj.other_valid_call) is method_type
 
+    def test_stub_out_many_method_another_object(self):
+        """Test that a method is replaced with a MockObject when stubout.many is used."""
+        from .mox_test_helper import TestClass
+
+        test_obj = TestClass(parent=TestClass())
+        test_obj.another_parent = TestClass()
+
+        method_type = type(test_obj.valid_call)
+        method_type_other = type(test_obj.other_valid_call)
+        with mox.stubout.many(
+            ["test.mox_test_helper.TestClass.valid_call", True],
+            ["test.mox_test_helper.TestClass.other_valid_call", True],
+        ) as (mock_valid, mock_other_valid), mox.expect:
+            mock_valid().returns("foo")
+            mock_other_valid().returns("bar")
+
+        assert isinstance(test_obj.valid_call, mox.MockAnything)
+        assert isinstance(test_obj.other_valid_call, mox.MockAnything)
+        assert type(test_obj.valid_call) is not method_type
+        assert type(test_obj.other_valid_call) is not method_type_other
+
+        actual_parent = test_obj.parent.valid_call()
+        actual_another_parent = test_obj.parent.other_valid_call()
+
+        mox.verify(mock_valid, mock_other_valid)
+
+        mox.Mox.unset_stubs_for_id(mock_valid._mox_id)
+        mox.Mox.unset_stubs_for_id(mock_other_valid._mox_id)
+        assert actual_parent == "foo"
+        assert actual_another_parent == "bar"
+        assert type(test_obj.parent.valid_call) is method_type
+        assert type(test_obj.parent.valid_call) is method_type_other
+
+    def test_stub_out_method_another_object_not_use_mock_anything(self):
+        """Test that a method is replaced with a MockObject when not using mock anything."""
+        test_obj = TestClass(parent=TestClass())
+        method_type = type(test_obj.parent.valid_call)
+        with mox.stubout(test_obj, "parent") as stub:
+            ...
+
+        assert isinstance(test_obj.parent.valid_call, mox.MockMethod)
+        assert type(test_obj.parent.valid_call) is not method_type
+
+        with pytest.raises(
+            mox.exceptions.UnknownMethodCallError, match="Method called is not a member of the object: non_existing"
+        ):
+            _ = test_obj.parent.non_existing
+
+        with stub._expect:
+            test_obj.parent.valid_call().returns("foo")
+
+        actual = test_obj.parent.valid_call()
+
+        with pytest.raises(
+            mox.exceptions.SwallowedExceptionError, match="Method called is not a member of the object: non_existing"
+        ):
+            mox.verify(stub)
+
+        mox.Mox.unset_stubs_for_id(stub._mox_id)
+        assert actual == "foo"
+        assert type(test_obj.parent.valid_call) is method_type
+
+    def test_stub_out_method_another_object_use_mock_anything(self):
+        """Test that a method is replaced with a MockMethod when using mock anything."""
+        test_obj = TestClass(parent=TestClass())
+        method_type = type(test_obj.parent.valid_call)
+        with mox.stubout(test_obj, "parent", True) as stub:
+            ...
+
+        assert isinstance(test_obj.parent.valid_call, mox.MockMethod)
+        assert isinstance(test_obj.parent.non_existing, mox.MockMethod)
+        assert type(test_obj.parent.valid_call) is not method_type
+
+        with stub._expect:
+            test_obj.parent.valid_call().returns("foo")
+            test_obj.parent.non_existing().returns("now it exists")
+
+        actual = test_obj.parent.valid_call()
+        exists = test_obj.parent.non_existing()
+
+        mox.verify(stub)
+
+        mox.Mox.unset_stubs_for_id(stub._mox_id)
+        assert actual == "foo"
+        assert exists == "now it exists"
+        assert type(test_obj.parent.valid_call) is method_type
+        with pytest.raises(AttributeError):
+            _ = test_obj.parent.non_existing
+
     def test_stub_out_method__unbound__comparator(self):
         instance = TestClass()
         with mox.stubout(TestClass, "other_valid_call") as stub, mox.expect:
@@ -4379,8 +4468,9 @@ class TestClass:
     SOME_CLASS_VAR = "test_value"
     _PROTECTED_CLASS_VAR = "protected value"
 
-    def __init__(self, ivar=None):
+    def __init__(self, ivar=None, parent=None):
         self.__ivar = ivar
+        self.parent = parent
 
     def __eq__(self, rhs):
         return self.__ivar == rhs

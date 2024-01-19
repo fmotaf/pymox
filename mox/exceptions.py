@@ -2,6 +2,12 @@
 import difflib
 
 
+class ObjectResolutionError(TypeError):
+    def __init__(self, path):
+        message = f"Could not resolve class, object or module from supplied reference: {path!r}"
+        super().__init__(message)
+
+
 class Error(AssertionError):
     """Base exception for this module."""
 

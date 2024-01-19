@@ -80,6 +80,7 @@ from .exceptions import (
     UnknownMethodCallError,
 )
 from .groups import MethodGroup, MultipleTimesGroup, UnorderedGroup
+from .helpers import resolve_object
 
 
 class _MoxManagerMeta(type):
@@ -202,6 +203,7 @@ class Mox(metaclass=_MoxManagerMeta):
         for mock_obj in self._mock_objects:
             mock_obj._reset()
 
+    @resolve_object
     def stubout(self, obj, attr_name, use_mock_anything=False):
         """Replace a method, attribute, etc. with a Mock.
 
@@ -238,6 +240,7 @@ class Mox(metaclass=_MoxManagerMeta):
         self.stubs.set(obj, attr_name, stub)
         return stub
 
+    @resolve_object
     def stubout_class(self, obj, attr_name):
         """Replace a class with a "mock factory" that will create mock objects.
 
