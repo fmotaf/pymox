@@ -1,6 +1,5 @@
 # Python imports
 import re
-import sys
 
 # Pip imports
 import pytest
@@ -17,7 +16,6 @@ def mock():
     return mox.Mox()
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
 class TestStringimports:
     def test_existing_function(self):
         with mox.stubout("test.test_helpers.subpackage.faraway.FarAwayClass.distant_method") as mock_distant_method:
@@ -59,7 +57,6 @@ class TestStringimports:
                 mock_distant_method().returns(True)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
 class TestMockObjectStringImports:
     """Verify that the MockObject class works as expected with string imports."""
 
@@ -127,7 +124,6 @@ class TestMockObjectStringImports:
         mock.reset_all()
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
 class TestMockObjectContextManagerStringImports:
     """Verify that the MockObject class works as expected with context managers and string imports."""
 
@@ -194,7 +190,6 @@ class TestMockObjectContextManagerStringImports:
         mox.reset(stub)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
 class TestMoxStringImports:
     """Verify Mox works correctly with string imports."""
 
@@ -430,7 +425,6 @@ class TestMoxStringImports:
         assert len(mock.stubs.cache) == 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="String imports not supported for Python < 3.9")
 class TestMoxContextManagerStringimports:
     """Verify Mox works correctly when using context managers and string imports."""
 
