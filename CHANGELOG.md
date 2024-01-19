@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0
+
+-   Python 3.7 is no longer supported
+-   String imports: now it's possible to `stubout` passing the objects' string path
+-   Other minor fixes
+
 ## 1.3.0
 
 -   Python 3.12 is now supported
