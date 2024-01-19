@@ -27,6 +27,7 @@ See mox_test.MoxTestBaseTest for how this class is actually used.
 # Python imports
 import abc
 import os
+import re
 
 # Internal imports
 import mox
@@ -48,6 +49,8 @@ class ExampleMoxTestMixin(object):
 
 
 class ExampleMoxTest(mox.MoxTestBase, ExampleMoxTestMixin):
+    __test__ = False
+
     DIR_PATH = "/path/to/some/directory"
 
     def test_success(self):
@@ -211,3 +214,112 @@ class SpecialClass(object):
 class ChildExampleClass(ExampleClass):
     def __init__(self):
         ExampleClass.__init__(self)
+
+
+class TestClass:
+    """This class is used only for testing the mock framework"""
+
+    SOME_CLASS_SET = {"a", "b", "c"}
+    SOME_CLASS_VAR = "test_value"
+    _PROTECTED_CLASS_VAR = "protected value"
+
+    def __init__(self, ivar=None, parent=None):
+        self.__ivar = ivar
+        self.parent = parent
+
+    def __eq__(self, rhs):
+        return self.__ivar == rhs
+
+    def __ne__(self, rhs):
+        return not self.__eq__(rhs)
+
+    def valid_call(self):
+        pass
+
+    def method_with_args(self, one, two, nine=None):
+        pass
+
+    def other_valid_call(self):
+        pass
+
+    def optional_args(self, foo="boom"):
+        pass
+
+    def valid_call_with_args(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def my_class_method(cls):
+        pass
+
+    @staticmethod
+    def my_static_method():
+        pass
+
+    def _protected_call(self):
+        pass
+
+    def __private_call(self):
+        pass
+
+    def __do_not_mock(self):
+        pass
+
+    def __getitem__(self, key):
+        """Return the value for key."""
+        return self.d[key]
+
+    def __setitem__(self, key, value):
+        """Set the value for key to value."""
+        self.d[key] = value
+
+    def __contains__(self, key):
+        """Returns True if d contains the key."""
+        return key in self.d
+
+    def __iter__(self):
+        pass
+
+    def re_search(self):
+        return re.search("a", "ivan")
+
+
+class ChildClass(TestClass):
+    """This inherits from TestClass."""
+
+    def __init__(self):
+        TestClass.__init__(self)
+
+    def child_valid_call(self):
+        pass
+
+
+class SimpleCallableClass(object):
+    """This class is callable, and that should be mockable!"""
+
+    def __init__(self):
+        pass
+
+    def __call__(self, param):
+        return param
+
+
+class ClassWithProperties(object):
+    def setter_attr(self, value):
+        pass
+
+    def getter_attr(self):
+        pass
+
+    prop_attr = property(getter_attr, setter_attr)
+
+
+class SubscribtableNonIterableClass(object):
+    def __getitem__(self, index):
+        raise IndexError
+
+
+class InheritsFromCallable(SimpleCallableClass):
+    """This class should also be mockable; it inherits from a callable class."""
+
+    pass
