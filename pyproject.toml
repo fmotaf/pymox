@@ -61,7 +61,11 @@ coverage = [
 ]
 
 [tool.hatch.version]
-path = "hatch/__about__.py"
+path = "mox/__version__.py"
+validate-bump = true
+scheme = "semver"
+pattern = "__version__ = version = \"(?P<version>[^\"]+)"
+
 
 [tool.hatch.build.targets.wheel]
 packages = ["mox", "mox/testing"]
