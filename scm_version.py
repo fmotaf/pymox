@@ -1,5 +1,7 @@
-# Pip imports
+# Python imports
 import pathlib
+
+# Pip imports
 from hatchling.metadata.core import ProjectMetadata
 from hatchling.plugin.manager import PluginManager
 

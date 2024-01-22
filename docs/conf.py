@@ -5,8 +5,8 @@
 
 # from importlib import metadata
 
-# Pip imports
-from scm_version import get_version
+# Internal imports
+from ..scm_version import get_version
 
 # We want an image in the README and include the README in the docs.
 suppress_warnings = ["image.nonlocal_uri"]
