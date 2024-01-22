@@ -1,7 +1,5 @@
 # Pip imports
-from setuptools_scm import get_version
 import pathlib
-
 from hatchling.metadata.core import ProjectMetadata
 from hatchling.plugin.manager import PluginManager
 
