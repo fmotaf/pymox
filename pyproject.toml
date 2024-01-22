@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -61,10 +61,10 @@ coverage = [
 ]
 
 [tool.hatch.version]
-path = "mox/__version__.py"
-validate-bump = true
-scheme = "semver"
-pattern = "__version__ = version = \"(?P<version>[^\"]+)"
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "__version__.py"
 
 [tool.hatch.build.targets.sdist]
 include = ["mox"]
