@@ -2,11 +2,9 @@
 # This file is dual licensed under the terms of the Apache License, Version
 # 2.0, and the MIT License.  See the LICENSE file in the root of this
 # repository for complete details.
-
-# from importlib import metadata
-
 # Internal imports
-from ..scm_version import get_version
+from scm_version import get_version
+
 
 # We want an image in the README and include the README in the docs.
 suppress_warnings = ["image.nonlocal_uri"]
