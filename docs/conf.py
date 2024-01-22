@@ -3,6 +3,9 @@
 # 2.0, and the MIT License.  See the LICENSE file in the root of this
 # repository for complete details.
 # Internal imports
+import os
+import sys
+sys.path.insert(0, os.path.abspath('.'))
 from scm_version import get_version
 
 
