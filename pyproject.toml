@@ -66,6 +66,8 @@ validate-bump = true
 scheme = "semver"
 pattern = "__version__ = version = \"(?P<version>[^\"]+)"
 
+[tool.hatch.build.targets.sdist]
+include = ["mox"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["mox", "mox/testing"]
