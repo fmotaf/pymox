@@ -1,6 +1,6 @@
 # Python imports
 import pathlib
-
+import os
 # Pip imports
 from hatchling.metadata.core import ProjectMetadata
 from hatchling.plugin.manager import PluginManager
@@ -8,7 +8,8 @@ from hatchling.plugin.manager import PluginManager
 
 def get_version():
     root = pathlib.Path(__file__).parent
-    print(root)
+    mox_folder = root.joinpath(os.path.normpath(os.getcwd()+"/mox/"))
+    print("mox folder: ", mox_folder)
     plugin_manager = PluginManager()
     metadata = ProjectMetadata(root, plugin_manager)
 
@@ -32,14 +33,12 @@ def write_toml(filepath="pyproject.toml", reset=True):
             new_contents.append(version_contents)
         else:
             new_contents.append(line)
-
     with open(filepath, "w") as outfile:
         outfile.writelines(new_contents)
 
 
 def main():
     print(get_version())
-
 
 if __name__ == "__main__":
     main()
