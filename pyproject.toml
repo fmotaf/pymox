@@ -2,10 +2,12 @@
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
+
 [project]
 name = "pymox"
 dynamic = ["version"]
 description = "Python mocking on steroids"
+
 
 [tool.poetry]
 name = "pymox"
