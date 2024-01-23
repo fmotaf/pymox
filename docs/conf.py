@@ -2,10 +2,13 @@
 # This file is dual licensed under the terms of the Apache License, Version
 # 2.0, and the MIT License.  See the LICENSE file in the root of this
 # repository for complete details.
-# Internal imports
+# Python imports
 import os
 import sys
+
+
 sys.path.insert(0, os.path.abspath('..'))
+# Internal imports
 from scm_version import get_version
 
 
