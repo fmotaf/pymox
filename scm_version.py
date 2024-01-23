@@ -1,5 +1,4 @@
 # Python imports
-import os
 import pathlib
 
 # Pip imports
@@ -9,8 +8,6 @@ from hatchling.plugin.manager import PluginManager
 
 def get_version():
     root = pathlib.Path(__file__).parent
-    mox_folder = root.joinpath(os.path.normpath(os.getcwd()+"/mox/"))
-    print("mox folder: ", mox_folder)
     plugin_manager = PluginManager()
     metadata = ProjectMetadata(root, plugin_manager)
 
