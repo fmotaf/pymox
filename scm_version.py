@@ -1,6 +1,7 @@
 # Python imports
-import pathlib
 import os
+import pathlib
+
 # Pip imports
 from hatchling.metadata.core import ProjectMetadata
 from hatchling.plugin.manager import PluginManager
@@ -39,6 +40,7 @@ def write_toml(filepath="pyproject.toml", reset=True):
 
 def main():
     print(get_version())
+
 
 if __name__ == "__main__":
     main()
