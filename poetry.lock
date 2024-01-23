@@ -374,21 +374,6 @@ hatchling = "*"
 semver = ">=2.13.0,<2.14.0"
 
 [[package]]
-name = "hatch-vcs"
-version = "0.4.0"
-description = "Hatch plugin for versioning with your preferred VCS"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "hatch_vcs-0.4.0-py3-none-any.whl", hash = "sha256:b8a2b6bee54cf6f9fc93762db73890017ae59c9081d1038a41f16235ceaf8b2c"},
-    {file = "hatch_vcs-0.4.0.tar.gz", hash = "sha256:093810748fe01db0d451fabcf2c1ac2688caefd232d4ede967090b1c1b07d9f7"},
-]
-
-[package.dependencies]
-hatchling = ">=1.1.0"
-setuptools-scm = ">=6.4.0"
-
-[[package]]
 name = "hatchling"
 version = "1.21.0"
 description = "Modern, extensible Python build backend"
@@ -822,44 +807,6 @@ files = [
 ]
 
 [[package]]
-name = "setuptools"
-version = "69.0.3"
-description = "Easily download, build, install, upgrade, and uninstall Python packages"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "setuptools-69.0.3-py3-none-any.whl", hash = "sha256:385eb4edd9c9d5c17540511303e39a147ce2fc04bc55289c322b9e5904fe2c05"},
-    {file = "setuptools-69.0.3.tar.gz", hash = "sha256:be1af57fc409f93647f2e8e4573a142ed38724b8cdd389706a867bb4efcf1e78"},
-]
-
-[package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
-testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8-2020", "ini2toml[lite] (>=0.9)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pip (>=19.1)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-perf", "pytest-ruff", "pytest-timeout", "pytest-xdist", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
-testing-integration = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging (>=23.1)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
-
-[[package]]
-name = "setuptools-scm"
-version = "8.0.4"
-description = "the blessed package to manage your versions by scm tags"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "setuptools-scm-8.0.4.tar.gz", hash = "sha256:b5f43ff6800669595193fd09891564ee9d1d7dcb196cab4b2506d53a2e1c95c7"},
-    {file = "setuptools_scm-8.0.4-py3-none-any.whl", hash = "sha256:b47844cd2a84b83b3187a5782c71128c28b4c94cad8bfb871da2784a5cb54c4f"},
-]
-
-[package.dependencies]
-packaging = ">=20"
-setuptools = "*"
-tomli = {version = ">=1", markers = "python_version < \"3.11\""}
-typing-extensions = "*"
-
-[package.extras]
-docs = ["entangled-cli[rich]", "mkdocs", "mkdocs-entangled-plugin", "mkdocs-material", "mkdocstrings[python]", "pygments"]
-rich = ["rich"]
-test = ["build", "pytest", "rich", "wheel"]
-
-[[package]]
 name = "shellingham"
 version = "1.5.4"
 description = "Tool to Detect Surrounding Shell"
@@ -949,6 +896,22 @@ files = [
 
 [package.dependencies]
 click = "*"
+
+[[package]]
+name = "versioningit"
+version = "3.0.0"
+description = "Versioning It with your Version In Git"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "versioningit-3.0.0-py3-none-any.whl", hash = "sha256:7cf99a78bf16e67c21a29d520184937835045c191b8105a07897aeff5e9d0f52"},
+    {file = "versioningit-3.0.0.tar.gz", hash = "sha256:4e3ce47a6424d850ae9e55e1b134a020e9fcbcb895338f107f2b5c51d34c9c1b"},
+]
+
+[package.dependencies]
+importlib-metadata = {version = ">=3.6", markers = "python_version < \"3.10\""}
+packaging = ">=17.1"
+tomli = {version = ">=1.2,<3.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "virtualenv"
@@ -1049,4 +1012,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <4"
-content-hash = "7aeee48d2b1db38641f47c5a11b6b2018f2656f4d65beeab43358740acde3eb2"
+content-hash = "e19882b703da79a5526e3847456f2d68347fe9e394e05f291e565a22bd0d6443"

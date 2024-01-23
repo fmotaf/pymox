@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatch","hatchling", "hatch-vcs"]
+requires = ["hatchling", "versioningit"]
 build-backend = "hatchling.build"
 
 
@@ -48,7 +48,7 @@ readme = "README.md"
 hatch = { version = "^1.9.1", python = ">=3.9,<4" }
 hatchling = { version = "^1.21.0", python = ">=3.8,<4" }
 hatch-semver = { version = "^1.0.1",  python = ">=3.9,<4" }
-hatch-vcs = { version = "^0.4.0", python = ">=3.8, <4" }
+versioningit = { version = "^3.0.0", python = ">=3.8,<4" }
 python = ">=3.8, <4"
 build = "^1.0.3"
 
@@ -64,14 +64,24 @@ coverage = [
 ]
 
 [tool.hatch.version]
-source = "vcs"
-path = "mox/__version__.py"
-validate-bump = true
-scheme = "semver"
-pattern = "__version__ = version = \"(?P<version>[^\"]+)"
+source = "versioningit"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "mox/__version__.py"
+[tool.versioningit]
+default-version = "0.0.0+unknown"
+
+[tool.versioningit.vcs]
+default-tag = "0.0.0+unknown"
+
+[tool.versioningit.next-version]
+method = "smallest"
+
+[tool.versioningit.format]
+distance = "{next_version}-dev{distance}+{vcs}{rev}"
+dirty = "{base_version}+d{build_date:%Y%m%d}"
+distance-dirty = "{next_version}-dev{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
+
+[tool.versioningit.write]
+file = "mox/__version__.py"
 
 [tool.hatch.build.targets.sdist]
 include = ["mox"]
