@@ -2,11 +2,14 @@
 # This file is dual licensed under the terms of the Apache License, Version
 # 2.0, and the MIT License.  See the LICENSE file in the root of this
 # repository for complete details.
+# Python imports
+import os
+import sys
 
-# from importlib import metadata
 
-# Pip imports
-from setuptools_scm import get_version
+sys.path.insert(0, os.path.abspath('..'))
+# Internal imports
+from scm_version import get_version
 
 
 # We want an image in the README and include the README in the docs.
@@ -57,7 +60,7 @@ copyright = f"2023, { author }"
 # built documents.
 
 # The full version, including alpha/beta/rc tags.
-release = get_version("..")
+release = get_version()
 print("RELEASE:")
 print(release)
 # release = metadata.version("pymox")

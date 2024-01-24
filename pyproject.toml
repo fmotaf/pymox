@@ -1,10 +1,13 @@
 [build-system]
-requires = ["setuptools>=58.2.0", "setuptools_scm[toml]>=6.2", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "versioningit"]
+build-backend = "hatchling.build"
+
 
 [project]
 name = "pymox"
 dynamic = ["version"]
+description = "Python mocking on steroids"
+
 
 [tool.poetry]
 name = "pymox"
@@ -42,7 +45,10 @@ keywords = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-setuptools_scm = { version = "^8.0", python = ">=3.8,<4" }
+hatch = { version = "^1.9.1", python = ">=3.9,<4" }
+hatchling = { version = "^1.21.0", python = ">=3.8,<4" }
+hatch-semver = { version = "^1.0.1",  python = ">=3.9,<4" }
+versioningit = { version = "^3.0.0", python = ">=3.8,<4" }
 python = ">=3.8, <4"
 build = "^1.0.3"
 
@@ -57,8 +63,31 @@ coverage = [
     {version = "^7.2", python = ">=3.8"}
 ]
 
-[tool.setuptools_scm]
-write_to = "mox/__version__.py"
+[tool.hatch.version]
+source = "versioningit"
+
+[tool.versioningit]
+default-version = "0.0.0+unknown"
+
+[tool.versioningit.vcs]
+default-tag = "0.0.0+unknown"
+
+[tool.versioningit.next-version]
+method = "smallest"
+
+[tool.versioningit.format]
+distance = "{next_version}-dev{distance}+{vcs}{rev}"
+dirty = "{base_version}+d{build_date:%Y%m%d}"
+distance-dirty = "{next_version}-dev{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
+
+[tool.versioningit.write]
+file = "mox/__version__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["mox"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mox", "mox/testing"]
 
 [tool.pytest.ini_options]
 addopts = [

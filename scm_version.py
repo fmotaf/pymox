@@ -1,5 +1,20 @@
+# Python imports
+import pathlib
+
 # Pip imports
-from setuptools_scm import get_version
+from hatchling.metadata.core import ProjectMetadata
+from hatchling.plugin.manager import PluginManager
+
+
+def get_version():
+    root = pathlib.Path(__file__).parent
+    plugin_manager = PluginManager()
+    metadata = ProjectMetadata(root, plugin_manager)
+
+    source = metadata.hatch.version.source
+
+    version_data = source.get_version_data()
+    return version_data["version"]
 
 
 def write_toml(filepath="pyproject.toml", reset=True):
@@ -16,7 +31,6 @@ def write_toml(filepath="pyproject.toml", reset=True):
             new_contents.append(version_contents)
         else:
             new_contents.append(line)
-
     with open(filepath, "w") as outfile:
         outfile.writelines(new_contents)
 
