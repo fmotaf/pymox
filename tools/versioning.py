@@ -1,5 +1,6 @@
 # Python imports
 import pathlib
+import re
 
 # Pip imports
 from hatchling.metadata.core import ProjectMetadata
@@ -7,7 +8,7 @@ from hatchling.plugin.manager import PluginManager
 
 
 def get_version():
-    root = pathlib.Path(__file__).parent
+    root = pathlib.Path(__file__).parent.parent
     plugin_manager = PluginManager()
     metadata = ProjectMetadata(root, plugin_manager)
 
@@ -17,20 +18,17 @@ def get_version():
     return version_data["version"]
 
 
-def write_toml(filepath="pyproject.toml", reset=True):
-    new_contents = []
+def write_toml(filepath="pyproject.toml", source="scm"):
     with open(filepath, "r") as infile:
-        contents = infile.readlines()
+        contents = infile.read()
 
-    version_contents = (
-        'version = "0.0.0"  # DO NOT CHANGE VERSION HERE\n' if reset else f'version = "{get_version()}"\n'
-    )
+    pattern = r"(\[tool\.hatch\.version\]\s)([\s\S]*?)(\s+\[tool\.versioningit\])"
+    if source == "scm":
+        replacement = 'source = "versioningit"'
+    else:
+        replacement = 'path = "mox/__version__.py"\nscheme = "semver"'
 
-    for line in contents:
-        if line.startswith("version ="):
-            new_contents.append(version_contents)
-        else:
-            new_contents.append(line)
+    new_contents = re.sub(pattern, r"\1" + replacement + r"\3", contents, flags=re.DOTALL)
     with open(filepath, "w") as outfile:
         outfile.writelines(new_contents)
 
