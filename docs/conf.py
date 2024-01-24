@@ -7,9 +7,9 @@ import os
 import sys
 
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 # Internal imports
-from scm_version import get_version
+from tools.versioning import get_version
 
 
 # We want an image in the README and include the README in the docs.
