@@ -11,7 +11,7 @@ if [ $? -eq 0 ]; then
     if [ $? -eq 0 ]; then
       if [ -n "$version" ]; then
         echo "new version: $version"
-        git tag "$version"
+        git tag "v$version"
       else
         echo "Error: Unable to extract version number."
         exit 1
