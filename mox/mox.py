@@ -554,6 +554,8 @@ class MockObject(MockAnything, object):
                 if class_name == "type":
                     class_name = class_to_mock.__self__.__name__
                 self._description = "{}.{}".format(class_name, method_name)
+            elif inspect.isbuiltin(self._class_to_mock):
+                self._description = class_to_mock.__name__
             else:
                 search_string = (
                     r"<(?P<extra>function|((un)?bound )?method) (?P<class>\w*)" r"(\.(?P<method>\w*))?( at \w+)?>"
@@ -810,7 +812,7 @@ class MockObject(MockAnything, object):
 
         try:
             return mock_method(*params, **named_params)
-        except AttributeError as e:
+        except (AttributeError, Error) as e:
             Mox.unset_stubs_for_id(self._mox_id)
             raise e
 
@@ -1188,6 +1190,9 @@ class MockMethod(object):
         params = ", ".join(
             [repr(p) for p in self._params or []] + ["%s=%r" % x for x in sorted((self._named_params or {}).items())]
         )
+        if self._description and self._name == "__call__":
+            return "%s(%s) -> %r" % (self._description, params, self._return_value)
+
         full_desc = "%s(%s) -> %r" % (self._name, params, self._return_value)
         if self._description:
             full_desc = "%s.%s" % (self._description, full_desc)

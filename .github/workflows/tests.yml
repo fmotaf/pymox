@@ -40,7 +40,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Run tests and collect coverage
-        run: poetry run pytest
+        run: poetry run pytest -vv --cov=mox --cov-branch --cov-report=xml test
 
       - name: Prepare coverage token
         if: success() && github.repository == 'ivancrneto/pymox'

@@ -1034,6 +1034,14 @@ class MockObjectTest(unittest.TestCase):
         )
         self.mock.reset_all()
 
+    def test_description_builtin(self):
+        mock_getcwd = self.mock.stubout("os.getcwd")
+        mock_getcwd().returns("/")
+
+        self.mock.replay_all()
+        assert mock_getcwd._description == "getcwd"
+        self.mock.reset_all()
+
     def test_mox_id(self):
         mock = mox.MockObject(TestClass)
         assert mock._mox_id is None
@@ -2423,10 +2431,9 @@ class MoxTest(unittest.TestCase):
         TestClass.other_valid_call(instance).returns("foo")
         self.mox.replay_all()
 
+        assert len(self.mox.stubs.cache) == 1
         # This should fail, since the instances are different
         self.assertRaises(mox.UnexpectedMethodCallError, TestClass.other_valid_call, "wrong self")
-
-        assert len(self.mox.stubs.cache) == 1
         self.assertRaises(mox.SwallowedExceptionError, self.mox.verify_all)
         assert len(self.mox.stubs.cache) == 0
 
@@ -3042,6 +3049,15 @@ class MoxContextManagerTest:
         with pytest.raises(mox.UnexpectedMethodCallError):
             mock_obj("ZOOBAZ")
 
+    def test_builin_with_bad_call(self):
+        """Test verifying calls to a builtin works."""
+        with mox.stubout("os.getcwd") as mock_obj, mox.expect:
+            mock_obj().returns("/")
+
+        with pytest.raises(mox.UnexpectedMethodCallError, match=r'Unexpected method call "getcwd\(\) -> None"'):
+            mock_obj()
+            mock_obj()
+
     def test_callable_object_verifies_signature(self):
         mock_obj = mox.create(CallableClass)
 
@@ -3517,12 +3533,13 @@ class MoxContextManagerTest:
         with mox.stubout(TestClass, "other_valid_call") as stub, mox.expect:
             TestClass.other_valid_call(instance).returns("foo")
 
+        m = mox.Mox._instances[stub._mox_id]
+        assert len(m.stubs.cache) == 1
+
         # This should fail, since the instances are different
         with pytest.raises(mox.UnexpectedMethodCallError):
             TestClass.other_valid_call("wrong self")
 
-        m = mox.Mox._instances[stub._mox_id]
-        assert len(m.stubs.cache) == 1
         with pytest.raises(mox.SwallowedExceptionError):
             m.verify_all()
         assert len(m.stubs.cache) == 0
@@ -4187,6 +4204,7 @@ class MoxTestBaseTest(unittest.TestCase):
         # Ensure no calls are made to verify_all()
         self.mox.stubout(self.test_mox, "verify_all")
         self.test_mox.unset_stubs()
+        self.test_mox.unset_stubs()
         self.test_stubs.unset_all()
         self.test_stubs.smart_unset_all()
         self.mox.replay_all()
@@ -4348,6 +4366,7 @@ class MoxTestBaseContextManagerTest(unittest.TestCase):
         m.stubout(self.test_mox, "verify_all")
 
         with m.expect:
+            self.test_mox.unset_stubs()
             self.test_mox.unset_stubs()
             self.test_stubs.unset_all()
             self.test_stubs.smart_unset_all()
