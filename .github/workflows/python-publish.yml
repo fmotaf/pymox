@@ -33,10 +33,7 @@ jobs:
         pip install poetry
         poetry install
     - name: Build package
-      run: |
-        poetry run python -c "import scm_version; scm_version.write_toml(reset=False)"
-        poetry build
-        poetry run python -c "import scm_version; scm_version.write_toml(reset=True)"
+      run: poetry run hatch build
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
