@@ -63,7 +63,7 @@ class UnexpectedMethodCallError(Error):
 
         Error.__init__(self)
         if expected is None:
-            self._str = "Unexpected method call %s" % (unexpected_method,)
+            self._str = 'Unexpected method call "%s"' % (unexpected_method,)
         else:
             differ = difflib.Differ()
             diff = differ.compare(str(unexpected_method).splitlines(True), str(expected).splitlines(True))
