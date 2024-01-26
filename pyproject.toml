@@ -7,6 +7,7 @@ build-backend = "hatchling.build"
 name = "pymox"
 dynamic = ["version"]
 description = "Python mocking on steroids"
+long-description-content-type = "text/markdown"
 
 
 [tool.poetry]
@@ -43,6 +44,7 @@ keywords = [
     "mox", "mock", "test", "mocking", "unittest", "pymox",
 ]
 readme = "README.md"
+long-description-content-type = "text/markdown"
 
 [tool.poetry.dependencies]
 hatch = { version = "^1.9.1", python = ">=3.9,<4" }
