@@ -3054,7 +3054,7 @@ class MoxContextManagerTest:
         with mox.stubout("os.getcwd") as mock_obj, mox.expect:
             mock_obj().returns("/")
 
-        with pytest.raises(mox.UnexpectedMethodCallError, match='Unexpected method call "getcwd\(\) -> None"'):
+        with pytest.raises(mox.UnexpectedMethodCallError, match=r'Unexpected method call "getcwd\(\) -> None"'):
             mock_obj()
             mock_obj()
 
