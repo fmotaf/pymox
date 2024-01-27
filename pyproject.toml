@@ -82,9 +82,6 @@ distance-dirty = "{next_version}-dev{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
 [tool.versioningit.write]
 file = "mox/__version__.py"
 
-[tool.hatch.build.targets.sdist]
-include = ["mox"]
-
 [tool.hatch.build.targets.wheel]
 packages = ["mox", "mox/testing"]
 
