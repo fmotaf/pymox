@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+
+-   Fixed tests output when mocking builtin functions
+-   Started using [`hatch`](https://hatch.pypa.io/latest/) as build tool
+-   Fixed version shown on docs
+
 ## 1.4.0
 
 -   Python 3.7 is no longer supported
